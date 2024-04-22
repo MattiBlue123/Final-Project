@@ -1,89 +1,44 @@
 import unittest
+from unittest.mock import patch
+from main import ArchiveCreator, BatchCompressor, PathValidator, TargetDirectoryValidator, UnitLengthValidator
 import os
-from compression import FileCompressor
-from compression_helper import RunLengthEncoder, FileTypeChecker, \
-    InputValidator
 
-
-class TestRunLengthEncoder(unittest.TestCase):
+class TestMain(unittest.TestCase):
     def setUp(self):
-        self.file_path = 'path_to_test_file'  # replace with path to a test file
-        self.file_type = FileTypeChecker(self.file_path).get_file_type()
-        self.unit_length = 1
-        self.encoder = RunLengthEncoder(self.file_path, self.file_type,
-                                        self.unit_length)
+        self.test_dir = "C:\\Users\\zohar\\OneDrive\\Desktop\\Test Cases"
+        self.test_cases = [os.path.join(self.test_dir, dir) for dir in os.listdir(self.test_dir) if os.path.isdir(os.path.join(self.test_dir, dir))]
 
-    def test_encode_text_file(self):
-        # Test encoding of a text file
-        if self.file_type == "text":
-            encoded_content = self.encoder.encode(self.file_path,
-                                                  self.file_type)
-            self.assertIsInstance(encoded_content, bytes)
+    @patch('builtins.input',
+           side_effect=['test_path', 'ok', 'test_target_dir', '1',
+                        'test_target_dir'])
+    def test_main(self, input):
+        # rest of your code
+        valid_path = PathValidator
+        valid_target_dir = TargetDirectoryValidator
+        valid_unit_length = UnitLengthValidator
 
-    def test_encode_binary_file(self):
-        # Test encoding of a binary file
-        if self.file_type == "binary":
-            encoded_content = self.encoder.encode(self.file_path,
-                                                  self.file_type)
-            self.assertIsInstance(encoded_content, bytes)
+        for test_case in self.test_cases:
+            all_paths = []
+            path = valid_path(test_case).validate_path()
+            all_paths.append(path)
 
-    def test_encode_invalid_file_type(self):
-        # Test encoding of an invalid file type
-        encoded_content = self.encoder.encode(self.file_path, "invalid")
-        self.assertEqual(encoded_content, "Invalid file type")
+            target_dir = valid_target_dir('test_target_dir').validate_target_directory_input()
 
+            unit_length = int('1')
+            unit_length = valid_unit_length(unit_length).validate_unit_length_input()
 
-class TestInputValidator(unittest.TestCase):
-    def setUp(self):
-        self.file_path = 'path_to_test_file'  # replace with path to a test file
-        self.target_directory = 'path_to_target_directory'  # replace with path to a target directory
-        self.unit_length = 1
-        self.validator = InputValidator(self.file_path, self.target_directory,
-                                        self.unit_length)
+            batch_compressor = BatchCompressor(all_paths, target_dir, unit_length)
+            compressed_files_lst = batch_compressor.compress_files()
+            archive = ArchiveCreator(compressed_files_lst, target_dir)
+            archive_file = archive.create_archive()
 
-    def test_valid_inputs(self):
-        # Test valid inputs
-        self.assertTrue(self.validator.are_inputs_valid())
+            self.assertTrue(os.path.exists(archive_file), f"Archive file not created for test case: {archive_file}")
 
-    def test_invalid_file_path(self):
-        # Test invalid file path
-        self.validator.path = 'invalid_path'
-        self.assertFalse(self.validator.is_valid_file_path())
+            print(f"Compression successful for test case: {test_case}")
 
-    def test_invalid_target_directory(self):
-        # Test invalid target directory
-        self.validator.target_directory = 'invalid_directory'
-        self.assertFalse(self.validator.is_valid_target_directory())
+            os.remove(archive_file)
 
-    def test_invalid_unit_length(self):
-        # Test invalid unit length
-        self.validator.unit_length = 0
-        self.assertFalse(self.validator.is_valid_unit_length())
+            self.assertFalse(os.path.exists(archive_file), f"Failed to delete archive file for test case: {archive_file}")
 
-
-class TestFileCompressor(unittest.TestCase):
-    def setUp(self):
-        self.file_path = 'path_to_test_file'  # replace with path to a test file
-        self.target_location = 'path_to_target_location'  # replace with path to a target location
-        self.unit_length = 1
-        self.compressor = FileCompressor(self.file_path, self.target_location,
-                                         self.unit_length)
-
-    def test_compress_and_save(self):
-        self.compressor.compress_and_save()
-        expected_file_path = os.path.join(self.target_location,
-                                          os.path.splitext(os.path.basename(
-                                              self.file_path))[
-                                              0] + "_rle_compressed.bin")
-        self.assertTrue(os.path.exists(expected_file_path),
-                        "Compressed file does not exist")
-
-    def test_compress_and_save_invalid_path(self):
-        invalid_path = 'invalid_path'
-        self.compressor.file_path = invalid_path
-        with self.assertRaises(FileNotFoundError):
-            self.compressor.compress_and_save()
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
