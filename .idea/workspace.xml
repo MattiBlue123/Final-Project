@@ -6,13 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="2e8fb633-2658-46e3-92e7-fe3548a44265" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/decoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/decompression.py" beforeDir="false" afterPath="$PROJECT_DIR$/decompression.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/decompressor_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/decompressor_init.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/funfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/funfile.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helper_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/helper_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -54,7 +51,7 @@
     "Python.compression_helper.executor": "Run",
     "Python.config.executor": "Run",
     "Python.decompression.executor": "Run",
-    "Python.decompressor_init.executor": "Run",
+    "Python.decompressor_init.executor": "Debug",
     "Python.encoder.executor": "Run",
     "Python.encoder_update.executor": "Run",
     "Python.everything_validator.executor": "Debug",
@@ -89,5 +86,12 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="__exception__[1]" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

@@ -14,8 +14,8 @@ class DecompressorInit:
         self.metadata = {}
         self.target_dir = ''
 
-    @staticmethod
-    def get_path():
+
+    def get_path(self):
         while True:
             path = Pv(zinput(
                 "Please enter the path to the archive file: ").strip(
@@ -23,8 +23,8 @@ class DecompressorInit:
             if not os.path.isfile(path):
                 print("Invalid path")
                 continue
-
-        return path
+            self.path_to_archive = path
+            break
 
     def get_target_dir(self):
         target_dir = zinput("Please enter the target directory: ").strip('""')
@@ -32,6 +32,7 @@ class DecompressorInit:
 
     def get_metadata(self):
         with open(self.path_to_archive, 'rb') as f:
+            print(f"Reading metadata from {self.path_to_archive}")
             f.seek(-4, os.SEEK_END)
             footer = f.read()
 
@@ -144,25 +145,20 @@ class DecompressorInit:
                                               start=user_input[1])
         elif user_input[0] == 'extract':
             try:
-                if len(user_input) == 1:  # extract all
-                    decompressor = Decompressor(self.path_to_archive,
-                                                self.target_dir, self.metadata,
-                                                self.metadata_length)
-                    decompressor.extract()
-
-                elif len(user_input) == 2:  # extract specific files
+                if len(user_input) == 2:  # extract specific files
                     # get relevant metadata only for the files to extract
                     self.metadata = self.get_relevant_metadata(user_input[1])
-                    decompressor = Decompressor(self.path_to_archive,
-                                                self.target_dir, self.metadata,
-                                                self.metadata_length)
-                    decompressor.extract(user_input[1])
+                decompressor = Decompressor(self.path_to_archive,
+                                            self.target_dir, self.metadata,
+                                            self.metadata_length)
+                decompressor.extract()
             except Exception as e:
                 print(f"Error extracting files: {e}")
 
     def decompressor_init_main(self):
         print(DI_PROMPTS["dhelp"])
         self.get_path()
+        print(f"{self.path_to_archive}")
         self.get_metadata()
         self.get_target_dir()
         while True:
@@ -170,6 +166,3 @@ class DecompressorInit:
             self.input_decesion_tree(user_input)
 
 
-if __name__ == '__main__':
-    d = DecompressorInit()
-    d.decompressor_init_main()

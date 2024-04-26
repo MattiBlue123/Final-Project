@@ -3,6 +3,7 @@ from helper_functions import zinput, create_metadata
 from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
                        UnitLengthValidator as UlV)
 from compression import Compressor
+from decompressor_init import DecompressorInit
 from config import FLAGS
 
 # say hello to user, explain rules
@@ -18,7 +19,7 @@ while True:
         # Reset all changes here...
         FLAGS["back_flag"] = False
         continue
-    if user_input == 'compress' or 'compress files' or 'c':
+    if user_input == ('compress' or 'compress files' or 'c'):
         # initialize validators
         encoded = b''
         metadata = dict()
@@ -51,26 +52,14 @@ while True:
         target_dir = zinput("Please enter the target directory: ").strip('""')
         target_dir = TdV(target_dir).validate_target_directory()
 
-
         compressor = Compressor(metadata, target_dir, archive_name)
         compressor.compress()
 
+    elif user_input == 'decompress' or 'decompress files' or 'd':
+        d = DecompressorInit()
+        d.decompressor_init_main()
 
-
-
-
-
-    # elif user_input == 'decompress':
-    #     while true:
-    #         path = zinput("Please enter the path of the archive file: ")
-    #         # validate the path
-    #         path = path.validate_path()
-
-
-
-
-
-        # show user the root
+    # show user the root
 
 #     # get user input of the path of the archive file
 #     # validate the path

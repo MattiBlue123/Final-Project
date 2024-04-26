@@ -13,7 +13,7 @@ class Decompressor:
     def extract_file(self, file_metadata, file_name, target_dir):
         decoder = RunLengthDecoder(file_metadata, file_name, target_dir,
                                    self.path_to_archive)
-        decoder.decode()
+        decoder.extract()
 
     def extract_all_files(self, directory_metadata, target_dir):
         for key, value in directory_metadata.items():

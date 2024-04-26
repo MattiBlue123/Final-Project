@@ -73,7 +73,7 @@ example_dict = {"address": {
 #     print(e)
 #     input("try again: ")
 
-key = "folder1"
-target_dir = r"C:\Users\zohar\OneDrive\Desktop"
-directory_path = os.path.join(target_dir, key)
-os.mkdir(directory_path)
+with open (r"C:\Users\zohar\OneDrive\Desktop\Test "
+           r"Cases\Text\test.txt_rle_compressed.bin") as f:
+    read = f.read()
+    print("yes")
