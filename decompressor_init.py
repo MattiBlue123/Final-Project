@@ -1,32 +1,37 @@
 import json
 import os
 from config import DI_PROMPTS, DI_POSSIBLE_ACTIONS
-from helper_functions import zinput
+from helper_functions import zinput, validate_path_format, parse_archive_path
 from validator import PathValidator as Pv, TargetDirectoryValidator as TdV
+from decompression import Decompressor
 
 
 class DecompressorInit:
 
     def __init__(self):
-        # self.path = self._get_path()
-        self.path = r"C:\Users\zohar\OneDrive\Desktop\Test Cases\Text\test.txt_rle_compressed.bin"
-        self.metadata = None
-        self.target_dir = None
+        self.path_to_archive = ""
+        self.metadata_length = 0
+        self.metadata = {}
+        self.target_dir = ''
 
     @staticmethod
-    def _get_path():
-        path = Pv(zinput(
-            "Please enter the path to the archive file: ").strip(
-            '""')).validate_path()
+    def get_path():
+        while True:
+            path = Pv(zinput(
+                "Please enter the path to the archive file: ").strip(
+                '""')).validate_path()
+            if not os.path.isfile(path):
+                print("Invalid path")
+                continue
+
         return path
 
     def get_target_dir(self):
         target_dir = zinput("Please enter the target directory: ").strip('""')
-        target_dir = TdV(target_dir).validate_target_directory()
-        return target_dir
+        self.target_dir = TdV(target_dir).validate_target_directory()
 
     def get_metadata(self):
-        with open(self.path, 'rb') as f:
+        with open(self.path_to_archive, 'rb') as f:
             f.seek(-4, os.SEEK_END)
             footer = f.read()
 
@@ -34,22 +39,22 @@ class DecompressorInit:
                 raise ValueError("Invalid archive")
 
             is_header = bytearray()
-            metadata_length = 0
 
             while f.tell() > 0:  # While not at the start of the file
                 f.seek(-1, os.SEEK_CUR)  # Move the pointer back 1 byte
                 byte = f.read(1)  # Read the byte
                 is_header.insert(0, byte[
                     0])  # Add the byte to the start of the found sequence
-                metadata_length += 1  # Increment the header_length
+                self.metadata_length += 1  # Increment the header_length
                 if len(is_header) > 4:  # If the found sequence
                     # is too long
-                    is_header.pop()  # Remove the last byte from the found sequence
+                    is_header.pop()  # Remove the last byte
                 if is_header == b'ZM\x01\x02':  # If the found sequence
                     # matches the target sequence
                     f.seek(3, os.SEEK_CUR)
+                    self.metadata_length -= 4
                     metadata = f.read(
-                        metadata_length - 8)  # avoid reading the footer
+                        self.metadata_length - 4)  # avoid reading the footer
                     metadata = metadata.decode('utf-8')
                     self.metadata = json.loads(metadata)
                     break
@@ -62,55 +67,107 @@ class DecompressorInit:
         for key, value in dictionary.items():
             new_path = f'{path}/{key}' if path else key
             if isinstance(value, dict):
-                # If the dictionary has any nested dictionaries, don't print the current path
+                # if it has files or folders, only print their paths
                 if any(isinstance(v, dict) for v in value.values()):
                     self.get_content_directory(value, new_path, start)
                 elif new_path.startswith(start):
                     print(new_path)
-            else:
-                continue
+            elif new_path.startswith(start):  # print files as well
+                print(new_path)
 
-    def user_path_input_validation(self):
+    def archive_path_validation(self):
         while True:
-            self.path = zinput("please input one path at a time: ").strip('""')
-            if not Pv(self.path).validate_path():
+            self.path_to_archive = zinput(
+                "please input the path of the archive file: ").strip('""')
+            if not Pv(self.path_to_archive).validate_path():
                 print("Invalid path")
                 continue
             break
-        return self.path
+        return self.path_to_archive
+
+    def validate_path_in_archive(self, archive_path_input):
+        if not validate_path_format(archive_path_input):
+            raise ValueError("Invalid path format")
+        # Parse the archive path into a list of keys
+        parsed_path = parse_archive_path(archive_path_input)
+
+        # Start with the root of the dictionary
+        current_dict = self.metadata
+
+        # For each key in the parsed path
+        for key in parsed_path:
+            # make sure key exist and is a file\folder
+            if key in current_dict and isinstance(current_dict[key], dict):
+                # if it's a folder, move to the next level of the dictionary
+                current_dict = current_dict[key]
+            else:
+                # if file/folder not found in directory, raise exception
+                raise ValueError("Invalid path in archive")
+
+        # If you have checked all keys without returning False, return True
+        return True
 
     def get_response(self):
         while True:
             response = zinput(DI_PROMPTS["get input"]).lower().split()
-            if len(response) == 0 or len(response) > 3:
+            if len(response) == 0 or len(response) > 2:
                 print("Invalid response")
                 continue
             if response[0] not in DI_POSSIBLE_ACTIONS:
                 print("Invalid response")
                 continue
-            if len(response) == 1:
-                return response
-
-            if response == 'd help':
-                print(DI_POSSIBLE_ACTIONS["d help"])
+            if response[0] == 'dhelp':
+                print(DI_PROMPTS["dhelp"])
                 continue
-            if response == '
-                continue
-        return response
+            if response[0] == 'show' or response[0] == 'extract':
+                # validate path in archive
+                if len(response) == 1:  # path hasn't been provided
+                    return response
+                if not self.validate_path_in_archive(response[1]):
+                    print("Invalid path in archive")
+                    continue
+            return response
 
+    def get_relevant_metadata(self, path):
+        path = parse_archive_path(path)
+        current_dict = self.metadata
+        for key in path:
+            current_dict = current_dict[key]
+        return current_dict
 
+    def input_decesion_tree(self, user_input):
+        if user_input[0] == 'show' and len(user_input) == 1:
+            return self.get_content_directory(self.metadata)
+
+        elif user_input[0] == 'show' and len(user_input) == 2:
+            return self.get_content_directory(self.metadata,
+                                              start=user_input[1])
+        elif user_input[0] == 'extract':
+            try:
+                if len(user_input) == 1:  # extract all
+                    decompressor = Decompressor(self.path_to_archive,
+                                                self.target_dir, self.metadata,
+                                                self.metadata_length)
+                    decompressor.extract()
+
+                elif len(user_input) == 2:  # extract specific files
+                    # get relevant metadata only for the files to extract
+                    self.metadata = self.get_relevant_metadata(user_input[1])
+                    decompressor = Decompressor(self.path_to_archive,
+                                                self.target_dir, self.metadata,
+                                                self.metadata_length)
+                    decompressor.extract(user_input[1])
+            except Exception as e:
+                print(f"Error extracting files: {e}")
 
     def decompressor_init_main(self):
-        print(DI_PROMPTS["d help"])
-        user_input = self.get_response()
-
-
-        # self._get_path()
+        print(DI_PROMPTS["dhelp"])
+        self.get_path()
         self.get_metadata()
-        # self.target_dir = self.get_target_dir()
-        self.target_dir = r'C:\Users\zohar\OneDrive\Desktop\Test Cases\Text'
-
-        zinput(actions_str)
+        self.get_target_dir()
+        while True:
+            user_input = self.get_response()
+            self.input_decesion_tree(user_input)
 
 
 if __name__ == '__main__':

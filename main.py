@@ -3,6 +3,7 @@ from helper_functions import zinput, create_metadata
 from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
                        UnitLengthValidator as UlV)
 from compression import Compressor
+from config import FLAGS
 
 # say hello to user, explain rules
 print("Welcome to the ZoZ RLE Compressor software.")
@@ -12,6 +13,11 @@ print("At any time, you can type 'exit' to quit")
 while True:
     user_input = zinput(
         "Do you want to compress (c) or decompress (d) files? ").lower().strip()
+    if FLAGS["back_flag"]:
+        print("Going back to main menu...")
+        # Reset all changes here...
+        FLAGS["back_flag"] = False
+        continue
     if user_input == 'compress' or 'compress files' or 'c':
         # initialize validators
         encoded = b''

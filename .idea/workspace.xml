@@ -5,17 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2e8fb633-2658-46e3-92e7-fe3548a44265" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/decompressor_init.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compression_update.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/decoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/decompression.py" beforeDir="false" afterPath="$PROJECT_DIR$/decompression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/encoder.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/everything_validator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/decompressor_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/decompressor_init.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/funfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/funfile.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helper_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/helper_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_updated.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

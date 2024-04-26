@@ -106,7 +106,7 @@ class ArchiveCreator:
         counter = None
         while True:
             suffix = f"({counter})" if counter is not None else ""
-            archive_name = f"{self.archive_name}_rle_compressed{suffix}.bin"
+            archive_name = f"{self.archive_name}_rle{suffix}"
             archive_path = os.path.join(self.target_dir, archive_name)
 
             if not os.path.exists(archive_path):

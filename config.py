@@ -1,9 +1,9 @@
 
 
-DI_POSSIBLE_ACTIONS = ['show', "exit", "extract", "d help"]
+DI_POSSIBLE_ACTIONS = ["show", "exit", "extract", "dhelp"]
 
 DI_PROMPTS = \
-    {"d help": "welcome to the decompressor.\n"
+    {"dhelp": "welcome to the decompressor.\n"
                   "At any time, you can type 'exit' to quit.\n"
                   "First you need to input the path of the archive file\n"
                   "then type 'show' the content directory of the "
@@ -13,6 +13,8 @@ DI_PROMPTS = \
                   "in the following format: 'show /path/to/directory'.\n"
                   "extract: You can type 'extract' followed by the directory path\n"
                   "in the following format: 'extract /path/to/directory'\n"
-                  "If you need help type 'd help' to see this message again.",
+                  "If you need help type 'dhelp' to see this message again.",
      "get input": "Please enter the action you would like to perform: "}
-print(DI_PROMPTS["help"])
+
+FLAGS = {"back_flag": False, "exit_flag": False}
+
