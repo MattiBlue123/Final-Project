@@ -1,52 +1,85 @@
-from compression import ArchiveCreator, BatchCompressor
-from everything_validator import (PathValidator, TargetDirectoryValidator,
-                                  UnitLengthValidator)
-from decompression import RunLengthDecoder
+import os.path
+from helper_functions import zinput, create_metadata
+from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
+                       UnitLengthValidator as UlV)
+from compression import Compressor
 
-if __name__ == "__main__":
-    valid_path = PathValidator
-    valid_target_dir = TargetDirectoryValidator
-    valid_unit_length = UnitLengthValidator
+# say hello to user, explain rules
+print("Welcome to the ZoZ RLE Compressor software.")
+print("You can compress or decompress files using this software.")
+print("At any time, you can type 'exit' to quit")
 
-    # the user inputs path or dir, it's validated and stored in paths, and is
-    # being asked to enter more or type "ok" to continue
-    all_paths = []
-    path = input("Enter path or directory to be compressed: ").strip('""')
-    path = valid_path(path).validate_path()
-    all_paths.append(path)
-    while True:
-        more = input(
-            "Enter more paths or directories or type 'ok' to continue: ").strip('""')
-        if more.lower() == 'ok':
-            break
-        else:
-            path = valid_path(more).validate_path()
-            all_paths.append(path)
+while True:
+    user_input = zinput(
+        "Do you want to compress (c) or decompress (d) files? ").lower().strip()
+    if user_input == 'compress' or 'compress files' or 'c':
+        # initialize validators
+        encoded = b''
+        metadata = dict()
+        path = Pv(zinput(
+            "please input one path at a time: ").strip('""')).validate_path()
+        archive_name = os.path.basename(path)
+        unit_length = UlV(zinput(
+            'the program is set to a default unit length '
+            'of 1. if you want to change it, enter a new numeric value.'
+            ' Otherwise, press "Enter": ').strip('""')).validate_unit_length()
 
-    # the user inputs target directory, it's validated and stored in target_dir
-    target_dir = input("Enter a target directory: ").strip('""')
-    target_dir = valid_target_dir(target_dir).validate_target_directory_input()
+        metadata[archive_name] = create_metadata(path, unit_length,
+                                                 archive_name)
+        while True:
+            path = zinput(
+                "Enter another path or type 'ok' to continue: ").strip('""')
+            if path.lower() == 'ok':
+                break
+            else:
+                # validate the paths
+                path = Pv(path).validate_path()
+                unit_length = zinput("Enter unit length: ").strip('""')
+                unit_length = UlV(unit_length).validate_unit_length()
+                path_name = os.path.basename(path)
+                metadata[os.path.basename(path)] = create_metadata(path,
+                                                                   unit_length,
+                                                                   path_name)
 
-    # the user inputs unit length, it's validated and stored in unit_length
-    unit_length = int(input("Enter a unit length: "))
-    unit_length = valid_unit_length(unit_length).validate_unit_length_input()
+        # get user input of target directory
+        target_dir = zinput("Please enter the target directory: ").strip('""')
+        target_dir = TdV(target_dir).validate_target_directory()
 
-    # Create a BatchCompressor instance
-    batch_compressor = BatchCompressor(all_paths, target_dir, unit_length)
-    # Compress the files
-    compressed_files_lst = batch_compressor.compress_files()
-    archive = ArchiveCreator(compressed_files_lst, target_dir)
-    archive.create_archive()
 
-    # Ask the user which file to decode
-    file_to_decode = input("Enter the path of the file to decode: ").strip('""')
-    file_to_decode = valid_path(file_to_decode).validate_path()
+        compressor = Compressor(metadata, target_dir, archive_name)
+        compressor.compress()
 
-    # Ask the user where to save the decoded file
-    save_path = input("Enter the path where the decoded file should be saved: ").strip('""')
-    save_path = valid_target_dir(save_path).validate_target_directory_input()
 
-    # Recreate the original file from the compressed file
-    decompress = RunLengthDecoder(file_to_decode, save_path)
-    decompress.decode()
 
+
+
+
+    # elif user_input == 'decompress':
+    #     while true:
+    #         path = zinput("Please enter the path of the archive file: ")
+    #         # validate the path
+    #         path = path.validate_path()
+
+
+
+
+
+        # show user the root
+
+#     # get user input of the path of the archive file
+#     # validate the path
+#     # validate is archive file
+#     # assume target dir for decoded file is the same as the target dir of
+#     # the archive file, user can input a different target dir
+#     # if different target dir = true:
+#     # validate the target dir
+#
+#     # call decompression function to decompress the files
+#     # store save files to the target dir
+#     else:
+#         print("Invalid input. Please try again")
+#         continue
+#
+#
+#
+# """

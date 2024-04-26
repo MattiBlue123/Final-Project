@@ -1,96 +1,41 @@
-import os
+# def recursive_items(dictionary, path='', start=''):
+#     for key, value in dictionary.items():
+#         new_path = f'{path}/{key}' if path else key
+#         if isinstance(value, dict):
+#             # If the dictionary has any nested dictionaries, don't print the current path
+#             if any(isinstance(v, dict) for v in value.values()):
+#                 recursive_items(value, new_path)
+#             else:
+#                 print(new_path)
+#         else:
+#             continue
+#
+# metadata = {'another_folder': {"another_file": {"nothing": 1}},
+#      'folder': {'type': "file", "file": {"inside_file":{"type":"a"}},
+#                 "more": 2, 3: 4, "file_f": {"5": 6}},
+#                     'file_d': {1: 2, 3: 4}, 'file_b': {5: 6}}
+#
+# recursive_items(metadata)
 
-
-def iterate_nested_dict(nested_dict):
-    # Check if nested_dict is a simple dictionary
-    if not any(isinstance(value, dict) for value in nested_dict.values()):
-        print(nested_dict)
-
-    for key, value in nested_dict.items():
+def recursive_items(dictionary, path='', start=''):
+    for key, value in dictionary.items():
+        new_path = f'{path}/{key}' if path else key
         if isinstance(value, dict):
-            # Check if it's a file's metadata
-            if "origin path" in value:
-                print(nested_dict)
-            else:
-                iterate_nested_dict(value)
-
-
-
-def create_file_metadata(path, unit_length, path_in_archive):
-    """
-    Create metadata for a file.
-
-    Parameters:
-    path (str): The path of the file.
-    unit_length (int): The unit length.
-    path_in_archive (str): The path in the archive.
-
-    Returns:
-    dict: The metadata of the file.
-    """
-    file_metadata = dict()
-    file_metadata["origin path"] = path
-    file_metadata["path in archive"] = path_in_archive
-    file_metadata["pointer"] = None
-    file_metadata["header length"] = None
-    file_metadata["encoded size"] = None
-    file_metadata["unit length"] = unit_length
-    file_metadata["data hash"] = None
-    file_metadata["original size"] = os.path.getsize(path)
-    return file_metadata
-
-
-def create_directory_metadata(path, unit_length, path_in_archive):
-    """
-    Create metadata for a directory.
-
-    Parameters:
-    path (str): The path of the directory.
-    unit_length (int): The unit length.
-    path_in_archive (str): The path in the archive.
-
-    Returns:
-    dict: The metadata of the directory.
-    """
-    directory_metadata = dict()
-    path_in_archive += "/" + os.path.basename(path)
-    for file in os.listdir(path):
-        file_path = os.path.join(path, file)
-        if os.path.isdir(file_path):
-            directory_metadata[file] = create_directory_metadata(
-                file_path, unit_length, path_in_archive)
+            # If the dictionary has any nested dictionaries, don't print the current path
+            if any(isinstance(v, dict) for v in value.values()):
+                recursive_items(value, new_path, start)
+            elif new_path.startswith(start):
+                print(new_path)
         else:
-            if path_in_archive in directory_metadata.values():
-                raise ValueError(f"A file with the same name already "
-                                 f"exists: {path_in_archive}")
-            directory_metadata[file] = create_file_metadata(
-                file_path, unit_length, path_in_archive)
-    return directory_metadata
+            continue
+
+possible_moves = "hey"
 
 
-def create_metadata(path, unit_length, path_in_archive=""):
-    """
-    Create metadata for a file or directory.
-
-    Parameters:
-    path (str): The path of the file or directory.
-    unit_length (int): The unit length.
-    path_in_archive (str): The path in the archive.
-
-    Returns:
-    dict: The metadata of the file or directory.
-    """
-    if os.path.isdir(path):
-        return create_directory_metadata(path, unit_length,
-                                         path_in_archive)
-    else:
-        return create_file_metadata(path, unit_length,
-                                    path_in_archive)
-
-
-metadata = create_metadata(r"C:\Users\zohar\OneDrive\Desktop\Test "
-                           r"Cases\Text\test.txt", 2)
-iterate_nested_dict(metadata)
+if "sdfheyo".startswith(possible_moves):
+    print("yes")
+else:
+    print("no")
 
 
 
