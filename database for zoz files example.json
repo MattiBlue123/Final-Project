@@ -1,0 +1,17 @@
+{
+	"file a":{
+		"path in archive": "(dir1/dir2/folder containing file a)",
+		"pinter": int in bytes
+		"unit_length": int,  # for decoding
+		"encoded_size": int, #
+		"header_len": int,
+		"data hash":"(sha-1 hash of all content extracted, in binary)",  # used for extraction inspection
+		"original_size": int,  # without header, used for extraction inspection
+
+
+
+	},
+	"folder c": {
+		
+	}
+}

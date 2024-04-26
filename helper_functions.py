@@ -1,19 +1,38 @@
 import os
+import hashlib
+
+
+def hash_data(data):
+    sha1 = hashlib.sha1()
+    if isinstance(data, str):
+        sha1.update(data.encode('utf-8'))  # encode the string to bytes
+    else:
+        sha1.update(data)  # data is already bytes
+    return sha1.digest()
 
 
 def iterate_nested_dict(nested_dict):
-    # Check if nested_dict is a simple dictionary
-    if not any(isinstance(value, dict) for value in nested_dict.values()):
-        print(nested_dict)
-
     for key, value in nested_dict.items():
         if isinstance(value, dict):
-            # Check if it's a file's metadata
-            if "origin path" in value:
-                print(nested_dict)
-            else:
-                iterate_nested_dict(value)
+            # If value is a dictionary, recursively process it
+            iterate_nested_dict(value)
+        else:
+            # If value is not a dictionary, print the key and value
+            print(f"{key}: {value}, {type(value)}")
 
+
+def zinput(prompt):
+    """
+    Get user input with support for graceful exit via "exit" command.
+
+    """
+    while True:
+        user_input = input(prompt)
+        if user_input.lower() == 'exit':
+            print("Exiting program.")
+            exit(0)
+        else:
+            return user_input
 
 
 def create_file_metadata(path, unit_length, path_in_archive):
@@ -29,6 +48,7 @@ def create_file_metadata(path, unit_length, path_in_archive):
     dict: The metadata of the file.
     """
     file_metadata = dict()
+    file_metadata["type"] = "file"
     file_metadata["origin path"] = path
     file_metadata["path in archive"] = path_in_archive
     file_metadata["pointer"] = None
@@ -53,18 +73,18 @@ def create_directory_metadata(path, unit_length, path_in_archive):
     dict: The metadata of the directory.
     """
     directory_metadata = dict()
-    path_in_archive += "/" + os.path.basename(path)
+    directory_metadata["type"] = "folder"
     for file in os.listdir(path):
         file_path = os.path.join(path, file)
         if os.path.isdir(file_path):
             directory_metadata[file] = create_directory_metadata(
-                file_path, unit_length, path_in_archive)
+                file_path, unit_length, path_in_archive + "/" + file)
         else:
             if path_in_archive in directory_metadata.values():
                 raise ValueError(f"A file with the same name already "
                                  f"exists: {path_in_archive}")
             directory_metadata[file] = create_file_metadata(
-                file_path, unit_length, path_in_archive)
+                file_path, unit_length, path_in_archive + "/" + file)
     return directory_metadata
 
 
@@ -86,11 +106,3 @@ def create_metadata(path, unit_length, path_in_archive=""):
     else:
         return create_file_metadata(path, unit_length,
                                     path_in_archive)
-
-
-metadata = create_metadata(r"C:\Users\zohar\OneDrive\Desktop\Test "
-                           r"Cases\Text\test.txt", 2)
-iterate_nested_dict(metadata)
-
-
-

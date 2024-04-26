@@ -5,14 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2e8fb633-2658-46e3-92e7-fe3548a44265" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/encoder.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/everything_validator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/compression_update.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database for zoz files example.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/decoder.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/encoder_update.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/helper_functions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main_updated.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/validator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compression_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression_helper.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/decompression.py" beforeDir="false" afterPath="$PROJECT_DIR$/decompression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_compression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/funfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/funfile.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +32,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -48,9 +55,12 @@
     "Python.compression.executor": "Run",
     "Python.compression_helper.executor": "Run",
     "Python.encoder.executor": "Run",
+    "Python.encoder_update.executor": "Run",
     "Python.everything_validator.executor": "Debug",
     "Python.funfile.executor": "Run",
+    "Python.helper_functions.executor": "Run",
     "Python.main.executor": "Run",
+    "Python.main_updated.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",

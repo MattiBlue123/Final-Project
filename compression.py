@@ -1,70 +1,112 @@
+import json
+
+from encoder_update import RunLengthEncoder
 import os
-from encoder import RunLengthEncoder
-import uuid
 
 
-class BatchCompressor:
+class Compressor:
 
-    def __init__(self, all_paths, target_dir, unit_length):
-        self.all_paths = all_paths
+    def __init__(self, metadata, target_dir, archive_name):
+        self.metadata = metadata
         self.target_dir = target_dir
-        self.unit_length = unit_length
-        self.metadata = {}
+        self.archive_name = archive_name
 
-    def compress_files(self):
-        compressed_files_lst = []
-        # # saves the name of the first file or folder, so it'll be the name
-        # # of the archive
-        # compressed_files_lst = [os.path.basename(self.all_paths[0])]
+    def file_compressor(self, metadata):
+        encoder = RunLengthEncoder(metadata["origin path"],
+                                   metadata["unit length"],
+                                   metadata["path in archive"])
+        rle_return_vals = encoder.encode()
+        encoded_content = rle_return_vals[0]
+        metadata = self.update_metadata(metadata, *rle_return_vals[1:])
+        return metadata, encoded_content, metadata["pointer"]
 
-        for path in self.all_paths:
-            if os.path.isdir(path):
-                folder_name = os.path.basename(path)
+    def compress_all_files(self, metadata,
+                           encoded_content=b'', pointer=0):
+        if not any(isinstance(value, dict) for value in metadata.values()):
+            return self.file_compressor(metadata)
 
-                # saves the number of files in the folder being compressed
-                files_num = str(len([item for item in os.listdir(
-                    path) if os.path.isfile(os.path.join(path, item))]))
+        for key, value in metadata.items():
+            if isinstance(value, dict):
+                # Check if it's a file's metadata
+                if "origin path" in value:
+                    # metadata[key], encoded_content, pointer =\
+                    #     self.file_compressor(value)
+                    metadata[
+                        key], encoded_content, pointer = self.file_compressor(
+                        metadata[key])
+                else:
+                    metadata[key], encoded_content, pointer =\
+                        self.compress_all_files(value, encoded_content, pointer)
 
-                for item in os.listdir(path):
-                    file_path = os.path.join(path, item)
+        return metadata, encoded_content, pointer
 
-                    # Create a RunLengthEncoder instance
-                    file_to_compress = RunLengthEncoder(file_path,
-                                                        self.unit_length,
-                                                        folder_name, files_num)
-                    compressed_files_lst.append(file_to_compress.encode())
-            else:
-                encoder = RunLengthEncoder(path, self.unit_length)
-                file_id = uuid.uuid4().bytes
-                encoded_content, size, file_id = encoder.encode()
-                # Add the metadata of the file to the dictionary
-                self.metadata[path] = {"id": file_id,
-                                       "unit_length": self.unit_length,
-                                       "size": size}
-                # Add the encoded content to the compressed files list
-                compressed_files_lst.append(encoded_content)
-        return compressed_files_lst
+    def update_metadata(self, file_metadata, header_length,
+                        encoded_content_size, hashed_content, bytes_num):
+        # encoded, header_length, encoded_size, hashed_content, original_size
+        file_metadata["original size"] = bytes_num
+        file_metadata["header length"] = header_length
+        file_metadata["encoded size"] = encoded_content_size
+        file_metadata["pointer"] = header_length + encoded_content_size
+        file_metadata["data hash"] = hashed_content
+        return file_metadata
+
+    def compress(self):
+        """
+        Create metadata for a file or directory.
+
+        Parameters:
+        path (str): The path of the file or directory.
+        unit_length (int): The unit length.
+        path_in_archive (str): The path in the archive.
+
+        Returns:
+        dict: The metadata of the file or directory.
+        """
+        metadata, encoded_content, end_pointer = self.compress_all_files(
+            self.metadata)
+        archive = ArchiveCreator(metadata, encoded_content, end_pointer,
+                                 self.target_dir, self.archive_name)
+        return archive.create_archive()
+
 
 class ArchiveCreator:
     """The Archive class is responsible for creating a compressed archive of
     the files in the target directory. The archive is created in the target."""
 
-    def __init__(self, compressed_files_lst, target_dir):
-        self.compressed_files_lst = compressed_files_lst
+    def __init__(self, metadata, encoded_content, pointer, target_dir,
+                 archive_name):
+        self.metadata = metadata
+        self.encoded_content = encoded_content
+        self.pointer = pointer
         self.target_dir = target_dir
+        self.archive_name = archive_name
+
+    def process_metadata(self):
+        """
+        Process the metadata for JSON serialization.
+
+        Returns:
+        bytes: The processed metadata.
+        """
+        # Convert metadata to JSON and encode to bytes
+        self.metadata = json.dumps(self.metadata)
+        self.metadata = self.metadata.encode('utf-8')
+
+        # Add header and footer to the metadata
+        header = b'ZM\x01\x02'
+        footer = b'ZM\x05\x06'
+        return header + self.metadata + footer
 
     def create_archive(self):
         # Create an archive of the compressed files
-
-        # naming the archive
-        original_file_name = os.path.basename(self.compressed_files_lst[0])
-        self.compressed_files_lst.pop(0)
+        self.encoded_content = self.encoded_content + self.process_metadata()
+        # naming the archive file
         # making sure there isn't an existing file with the same name.
         # adding a number to the name if there is.
         counter = None
         while True:
-            suffix = f"_{counter}" if counter is not None else ""
-            archive_name = f"{original_file_name}_rle_compressed{suffix}.bin"
+            suffix = f"({counter})" if counter is not None else ""
+            archive_name = f"{self.archive_name}_rle_compressed{suffix}.bin"
             archive_path = os.path.join(self.target_dir, archive_name)
 
             if not os.path.exists(archive_path):
@@ -72,6 +114,5 @@ class ArchiveCreator:
             counter = 1 if counter is None else counter + 1
 
         with open(archive_path, 'wb') as archive:
-            for compressed_file in self.compressed_files_lst:
-                archive.write(compressed_file)
+            archive.write(self.encoded_content)
         print(f"Archive created and saved to: {archive_path}")
