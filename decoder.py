@@ -29,22 +29,45 @@ class RunLengthDecoder:
         return header
 
     def content_decoder(self):
+
+        print("Decoding content")
         with open(self.path_to_archive, 'rb') as f:
-            f.seek(self.pointer + self.header_length)
+            print(f"Reading content from {self.file_name}")
+            try:
+                f.seek(self.pointer)
+            except ValueError:
+                print(f"Error seeking for pointer in {self.file_name}")
+            try:
+                f.seek(-self.encoded_size, os.SEEK_CUR)
+            except ValueError:
+                print(f"Error finding content beginning"
+                      f" of {self.file_name}")
             content = f.read(self.encoded_size)
-        sequences = []  # List to hold sequences
-        self.decoded_size = 0
-        # decode the content
-        for i in range(0, self.encoded_size, self.unit_length + 1):
-            count = struct.unpack('B', content[i:i + 1])[0]
-            sequence = content[i + 1:i + self.unit_length + 1]
-            sequences.append(sequence * count)
-            self.decoded_size += len(sequence * count)
-        # Concatenate all sequences at once
-        self.decoded_content = b''.join(sequences)
-        # Validate right after decoding
-        self.validate_header()
-        self.validate_decoding_process()
+            print(f"Done reading content : {content}")  # working
+            print(f"{self.encoded_size % (self.unit_length + 1) != 0}")
+            extra_bytes = 0
+            if self.encoded_size % (self.unit_length + 1) != 0:
+                extra_bytes = self.encoded_size % (self.unit_length + 1)
+            print(f"Extra bytes: {extra_bytes}")
+
+            for i in range(0, self.encoded_size - extra_bytes,
+                           self.unit_length + 1):
+                print("inside loop")
+                appearances_num = struct.unpack('B', content[i:i + 1])[0]
+                print(type(appearances_num), appearances_num)
+                unit = content[i + 1:i + self.unit_length + 1]
+                print(unit)
+                self.decoded_content += unit * appearances_num
+                print(self.decoded_content)
+
+            if self.encoded_size % (self.unit_length + 1) != 0:
+                appearances_num = struct.unpack('B', content[
+                                                     self.encoded_size -
+                                                     extra_bytes:self.encoded_size - extra_bytes + 1])[
+                    0]
+
+                unit = content[self.encoded_size - extra_bytes + 1:]
+                self.decoded_content += unit * appearances_num
 
     def validate_header(self):
         # validate the header

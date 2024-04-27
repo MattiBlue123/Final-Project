@@ -19,52 +19,82 @@ class RunLengthEncoder:
             content = f.read()
         return content
 
+    # def content_encoder(self, header):
+    #     # open the file in binary mode
+    #     encoded = header
+    #     count = 1
+    #     curr_unit = None
+    #     # the following line was added for the header
+    #     # it's not len( content) in order to reduce runtime complexity
+    #     encoded_content_size = 0
+    #
+    #     if self.unit_length >= self.bytes_num:
+    #         encoded = self.content
+    #         return encoded
+    #         # encode the content
+    #
+    #     for i in range(0, self.bytes_num - (self.bytes_num % self.unit_length),
+    #                    self.unit_length):
+    #         # making sure next unit exists
+    #         if i + self.unit_length >= self.bytes_num:
+    #             break
+    #         curr_unit = self.content[i:i + self.unit_length]
+    #         next_unit = self.content[
+    #                     i + self.unit_length:i + 2 * self.unit_length]
+    #
+    #         if curr_unit == next_unit:
+    #             count += 1
+    #
+    #         else:
+    #             encoded_unit = struct.pack('B', count) + curr_unit
+    #             encoded += encoded_unit
+    #             encoded_content_size += len(
+    #                 encoded_unit)  # Update the size of the encoded content
+    #             count = 1
+    #     # encode the last unit
+    #     encoded_unit = struct.pack('B', count) + curr_unit
+    #     encoded += encoded_unit
+    #     encoded_content_size += len(
+    #         encoded_unit)  # Update the size of the encoded content
+    #
+    #     # encoding the remaining bytes (outside the unit length)
+    #     if self.bytes_num % self.unit_length != 0:
+    #         encoded_unit = (struct.pack('B', count) +
+    #                         self.content[self.bytes_num - (
+    #                                 self.bytes_num % self.unit_length):])
+    #         encoded += encoded_unit
+    #         encoded_content_size += len(
+    #             encoded_unit)  # Update the size of the encoded content
+    #     return encoded, encoded_content_size
     def content_encoder(self, header):
-        # open the file in binary mode
         encoded = header
         count = 1
-        curr_unit = None
-        # the following line was added for the header
-        # it's not len( content) in order to reduce runtime complexity
         encoded_content_size = 0
 
         if self.unit_length >= self.bytes_num:
-            encoded = self.content
+            encoded = struct.pack('B', 1) + self.content
             return encoded
-            # encode the content
 
-        for i in range(0, self.bytes_num - (self.bytes_num % self.unit_length),
-                       self.unit_length):
-            # making sure next unit exists
-            if i + self.unit_length >= self.bytes_num:
-                break
-            curr_unit = self.content[i:i + self.unit_length]
-            next_unit = self.content[
-                        i + self.unit_length:i + 2 * self.unit_length]
+        curr_unit = self.content[0:self.unit_length]
+        for i in range(self.unit_length, self.bytes_num, self.unit_length):
+            if i + self.unit_length > self.bytes_num:
+                next_unit = self.content[i:]
+            else:
+                next_unit = self.content[i:i + self.unit_length]
 
             if curr_unit == next_unit:
                 count += 1
-
             else:
                 encoded_unit = struct.pack('B', count) + curr_unit
                 encoded += encoded_unit
-                encoded_content_size += len(
-                    encoded_unit)  # Update the size of the encoded content
+                encoded_content_size += len(encoded_unit)
                 count = 1
-        # encode the last unit
+                curr_unit = next_unit
+
         encoded_unit = struct.pack('B', count) + curr_unit
         encoded += encoded_unit
-        encoded_content_size += len(
-            encoded_unit)  # Update the size of the encoded content
+        encoded_content_size += len(encoded_unit)
 
-        # encoding the remaining bytes (outside the unit length)
-        if self.bytes_num % self.unit_length != 0:
-            encoded_unit = (struct.pack('B', count) +
-                            self.content[self.bytes_num - (
-                                    self.bytes_num % self.unit_length):])
-            encoded += encoded_unit
-            encoded_content_size += len(
-                encoded_unit)  # Update the size of the encoded content
         return encoded, encoded_content_size
 
     def encode(self):
