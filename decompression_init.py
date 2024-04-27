@@ -14,7 +14,6 @@ class DecompressorInit:
         self.metadata = {}
         self.target_dir = ''
 
-
     def get_path(self):
         while True:
             path = Pv(zinput(
@@ -158,11 +157,8 @@ class DecompressorInit:
     def decompressor_init_main(self):
         print(DI_PROMPTS["dhelp"])
         self.get_path()
-        print(f"{self.path_to_archive}")
         self.get_metadata()
         self.get_target_dir()
         while True:
             user_input = self.get_response()
             self.input_decesion_tree(user_input)
-
-

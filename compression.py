@@ -1,7 +1,7 @@
 import json
-
-from encoder_update import RunLengthEncoder
+from encoder import RunLengthEncoder
 import os
+from config import FLAGS
 
 
 class Compressor:
@@ -35,8 +35,9 @@ class Compressor:
                         key], encoded_content, pointer = self.file_compressor(
                         metadata[key])
                 else:
-                    metadata[key], encoded_content, pointer =\
-                        self.compress_all_files(value, encoded_content, pointer)
+                    metadata[key], encoded_content, pointer = \
+                        self.compress_all_files(value, encoded_content,
+                                                pointer)
 
         return metadata, encoded_content, pointer
 
@@ -116,3 +117,4 @@ class ArchiveCreator:
         with open(archive_path, 'wb') as archive:
             archive.write(self.encoded_content)
         print(f"Archive created and saved to: {archive_path}")
+        FLAGS["back flag"] = True

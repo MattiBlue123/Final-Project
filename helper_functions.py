@@ -1,6 +1,9 @@
 import os
 import hashlib
 from config import FLAGS
+import re
+
+
 def hash_data(data):
     sha1 = hashlib.sha1()
     if isinstance(data, str):
@@ -36,6 +39,8 @@ def zinput(prompt):
             return ""
         else:
             return user_input
+
+
 def parse_archive_path(archive_path):
     # Remove leading and trailing slashes
     archive_path = archive_path.strip('/')
@@ -43,12 +48,14 @@ def parse_archive_path(archive_path):
     files = archive_path.split('/')
     return files
 
+
 def validate_path_format(path):
     pattern = r"^/([\w\.\-\_ ]+/)*[\w\.\-\_ ]+$"
     if re.match(pattern, path):
         return True
     else:
         return False
+
 
 def create_file_metadata(path, unit_length, path_in_archive):
     """

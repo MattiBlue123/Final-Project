@@ -83,8 +83,6 @@ class TargetDirectoryValidator:
 
 class UnitLengthValidator:
     def __init__(self, unit_length):
-        if unit_length == "":
-            unit_length = 1
         self.unit_length = unit_length
 
     def __is_valid_unit_length(self):
@@ -98,6 +96,8 @@ class UnitLengthValidator:
         return True
 
     def validate_unit_length(self):
+        if self.unit_length is "":
+            return ""
         while not self.__is_valid_unit_length():
             self.unit_length = input("Enter a valid unit length: ")
         return int(self.unit_length)

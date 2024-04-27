@@ -73,7 +73,3 @@ example_dict = {"address": {
 #     print(e)
 #     input("try again: ")
 
-with open (r"C:\Users\zohar\OneDrive\Desktop\Test "
-           r"Cases\Text\test.txt_rle_compressed.bin") as f:
-    read = f.read()
-    print("yes")
