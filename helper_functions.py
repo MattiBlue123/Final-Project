@@ -13,16 +13,6 @@ def hash_data(data):
     return sha1.digest()
 
 
-def iterate_nested_dict(nested_dict):
-    for key, value in nested_dict.items():
-        if isinstance(value, dict):
-            # If value is a dictionary, recursively process it
-            iterate_nested_dict(value)
-        else:
-            # If value is not a dictionary, print the key and value
-            print(f"{key}: {value}, {type(value)}")
-
-
 def zinput(prompt):
     """
     Get user input with support for graceful exit via "exit" command.
@@ -57,71 +47,4 @@ def validate_path_format(path):
         return False
 
 
-def create_file_metadata(path, unit_length, path_in_archive):
-    """
-    Create metadata for a file.
 
-    Parameters:
-    path (str): The path of the file.
-    unit_length (int): The unit length.
-    path_in_archive (str): The path in the archive.
-
-    Returns:
-    dict: The metadata of the file.
-    """
-    file_metadata = dict()
-    file_metadata["type"] = "file"
-    file_metadata["origin path"] = path
-    file_metadata["path in archive"] = path_in_archive
-    file_metadata["pointer"] = None
-    file_metadata["header length"] = None
-    file_metadata["encoded size"] = None
-    file_metadata["unit length"] = unit_length
-    file_metadata["data hash"] = None
-    file_metadata["original size"] = os.path.getsize(path)
-    return file_metadata
-
-
-def create_directory_metadata(path, unit_length, path_in_archive):
-    """
-    Create metadata for a directory.
-
-    Parameters:
-    path (str): The path of the directory.
-    unit_length (int): The unit length.
-    path_in_archive (str): The path in the archive.
-
-    Returns:
-    dict: The metadata of the directory.
-    """
-    directory_metadata = dict()
-    directory_metadata["type"] = "folder"
-    for file in os.listdir(path):
-        file_path = os.path.join(path, file)
-        if os.path.isdir(file_path):
-            directory_metadata[file] = create_directory_metadata(
-                file_path, unit_length, path_in_archive + "/" + file)
-        else:
-            directory_metadata[file] = create_file_metadata(
-                file_path, unit_length, path_in_archive + "/" + file)
-    return directory_metadata
-
-
-def create_metadata(path, unit_length, path_in_archive=""):
-    """
-    Create metadata for a file or directory.
-
-    Parameters:
-    path (str): The path of the file or directory.
-    unit_length (int): The unit length.
-    path_in_archive (str): The path in the archive.
-
-    Returns:
-    dict: The metadata of the file or directory.
-    """
-    if os.path.isdir(path):
-        return create_directory_metadata(path, unit_length,
-                                         path_in_archive)
-    else:
-        return create_file_metadata(path, unit_length,
-                                    path_in_archive)

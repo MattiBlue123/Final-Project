@@ -53,3 +53,8 @@ CI_PROMPTS = \
         "set default unit length": 'Please enter the default unit length, '
                                    'or press "Enter" to skip: ',
      "another path": "Enter another path or type 'ok' to continue: "}
+
+MAX_COUNT = 255
+
+
+

@@ -59,6 +59,15 @@ class PathValidator:
             self.path = input("Enter valid path: ").strip('""')
         return self.path
 
+    def validate_path_in_archive(self, path_in_archive, general_metadata):
+        for key, value in general_metadata.items():
+            if key == "path in_archive" and value == path_in_archive:
+                return True
+            elif isinstance(value, dict):
+                if self.validate_path_in_archive(path_in_archive, value):
+                    return True
+        return False
+
 
 class TargetDirectoryValidator:
     def __init__(self, target_directory):
@@ -69,6 +78,9 @@ class TargetDirectoryValidator:
             if not os.path.exists(self.target_directory):
                 raise FileNotFoundError(
                     f"Directory not found: {self.target_directory}")
+            if not os.path.isdir(self.target_directory):
+                raise NotADirectoryError(
+                    f"Not a directory: {self.target_directory}")
         except Exception as e:
             print(f"Error validating target directory: {e}")
             return False

@@ -72,7 +72,8 @@ class DecompressorInit:
                     self.get_content_directory(value, new_path, start)
                 elif new_path.startswith(start):
                     print(new_path)
-            elif new_path.startswith(start):  # print files as well
+            elif new_path.startswith(start) and key == "type" and isinstance(
+                    value, dict):
                 print(new_path)
 
     def archive_path_validation(self):

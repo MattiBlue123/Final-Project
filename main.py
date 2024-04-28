@@ -57,7 +57,6 @@ class Main:
 
 
 if __name__ == '__main__':
-    m = Main()
-    m.main_menu()
+    Main().main_menu()
 
 
