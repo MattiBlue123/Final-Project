@@ -87,7 +87,7 @@ class DecompressorInit:
 
     def validate_path_in_archive(self, archive_path_input):
         if not validate_path_format(archive_path_input):
-            raise ValueError("Invalid path format")
+            return False
         # Parse the archive path into a list of keys
         parsed_path = parse_archive_path(archive_path_input)
 
@@ -102,7 +102,7 @@ class DecompressorInit:
                 current_dict = current_dict[key]
             else:
                 # if file/folder not found in directory, raise exception
-                raise ValueError("Invalid path in archive")
+                return False
 
         # If you have checked all keys without returning False, return True
         return True
@@ -124,7 +124,7 @@ class DecompressorInit:
                 if len(response) == 1:  # path hasn't been provided
                     return response
                 if not self.validate_path_in_archive(response[1]):
-                    print("Invalid path in archive")
+                    print("Invalid path in archive or path format")
                     continue
             return response
 
@@ -159,6 +159,5 @@ class DecompressorInit:
         self.get_path()
         self.get_metadata()
         self.get_target_dir()
-        while True:
-            user_input = self.get_response()
-            self.input_decesion_tree(user_input)
+        user_input = self.get_response()
+        self.input_decesion_tree(user_input)

@@ -11,9 +11,13 @@ class Decompressor:
         self.metadata_length = metadata_length
 
     def extract_file(self, file_metadata, file_name, target_dir):
-        ("I've made it to the extract file method!")
+        print(file_metadata)
+        print(file_name)
+        print(target_dir)
+        print(self.path_to_archive)
         decoder = RunLengthDecoder(file_metadata, file_name, target_dir,
                                    self.path_to_archive)
+
         decoder.extract()
 
     def extract_all_files(self, directory_metadata, target_dir):
@@ -22,6 +26,7 @@ class Decompressor:
         for key, value in directory_metadata.items():
             if isinstance(value, dict):
                 if value["type"] == "folder":
+                    print(f"found a folder: {key}\n")
                     directory_path = os.path.join(target_dir, key)
                     os.mkdir(directory_path)
                     self.extract_all_files(value, directory_path)

@@ -103,5 +103,5 @@ class RunLengthEncoder:
         header = hash_data(self.path_in_archive.encode('utf-8'))
         encoded, encoded_content_size = self.content_encoder(header)
 
-        return encoded, len(
-            header), encoded_content_size, hashed_content, self.bytes_num
+        return (encoded, len(header), encoded_content_size,
+                hashed_content, self.bytes_num)

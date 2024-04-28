@@ -15,8 +15,7 @@ Possible actions are:
 """}
 
 MAIN_POSSIBLE_ACTIONS = ["c", "d", "exit", "--help", "info", "back"]
-if "c" in MAIN_POSSIBLE_ACTIONS:
-    print("fuck")
+
 
 DI_POSSIBLE_ACTIONS = ["show", "exit", "extract", "dhelp", "back", "--help"]
 

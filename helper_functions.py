@@ -102,9 +102,6 @@ def create_directory_metadata(path, unit_length, path_in_archive):
             directory_metadata[file] = create_directory_metadata(
                 file_path, unit_length, path_in_archive + "/" + file)
         else:
-            if path_in_archive in directory_metadata.values():
-                raise ValueError(f"A file with the same name already "
-                                 f"exists: {path_in_archive}")
             directory_metadata[file] = create_file_metadata(
                 file_path, unit_length, path_in_archive + "/" + file)
     return directory_metadata
