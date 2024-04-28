@@ -1,7 +1,7 @@
 import os
 from compression import Compressor
 from config import CI_PROMPTS
-from helper_functions import zinput, create_metadata
+from helper_functions import zinput
 from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
                        UnitLengthValidator as UlV)
 
@@ -79,15 +79,8 @@ class CompressorInit:
                 directory_metadata[file] = self.create_directory_metadata(
                     file_path, unit_length, path_in_archive + "/" + file)
             else:
-                file_path_in_archive = path_in_archive + "/" + file
-                if Pv(file_path_in_archive).validate_path_in_archive(
-                        self.metadata, directory_metadata):
-                    print(f"File {file_path_in_archive} already exists in "
-                          f"the same directory in the archive")
-                    return None
-                    #  dont add that file to the metadata
-                    directory_metadata[file] = self.create_file_metadata(
-                        file_path, unit_length, file_path_in_archive)
+                directory_metadata[file] = self.create_file_metadata(
+                    file_path, unit_length, path_in_archive + "/" + file)
         return directory_metadata
 
     def create_metadata(self, path, unit_length, path_in_archive=""):
@@ -118,8 +111,8 @@ class CompressorInit:
             unit_length = self.get_unit_length()
         else:
             unit_length = self.unit_length
-        self.metadata[self.archive_name] = create_metadata(path, unit_length,
-                                                           self.archive_name)
+        self.metadata[self.archive_name] =\
+            self.create_metadata(path, unit_length, self.archive_name)
         self.get_target_dir()
         while True:
             path = zinput(

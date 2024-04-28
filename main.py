@@ -26,10 +26,6 @@ class Main:
         elif user_input == 'info':
             pass
 
-
-
-        # show user the root
-
     @staticmethod
     def get_user_input():
         while True:
@@ -44,7 +40,7 @@ class Main:
                 continue
             return response
 
-    def main_menu(self):
+    def main(self):
         while True:
             # say hello to user, explain rules
             print(MAIN_PROMPTS["greeting"])
@@ -57,6 +53,6 @@ class Main:
 
 
 if __name__ == '__main__':
-    Main().main_menu()
+    Main().main()
 
 

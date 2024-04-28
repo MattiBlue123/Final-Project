@@ -1,8 +1,10 @@
 import json
 import os
 from config import DI_PROMPTS, DI_POSSIBLE_ACTIONS
-from helper_functions import zinput, validate_path_format, parse_archive_path
-from validator import PathValidator as Pv, TargetDirectoryValidator as TdV
+from helper_functions import (zinput, validate_path_format, parse_archive_path,
+                              make_unique_path)
+from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
+                       ArchiveValidator as Av)
 from decompression import Decompressor
 
 
@@ -27,7 +29,17 @@ class DecompressorInit:
 
     def get_target_dir(self):
         target_dir = zinput("Please enter the target directory: ").strip('""')
-        self.target_dir = TdV(target_dir).validate_target_directory()
+        target_dir = TdV(target_dir).validate_target_directory()
+        #  creating a file to extract the files to
+        target_dir_name = os.path.basename(self.path_to_archive)
+        self.target_dir = make_unique_path(target_dir, target_dir_name)
+        print(f"creating target dir: {self.target_dir} this is a unique path")
+        os.mkdir(self.target_dir)
+        print(f"now target dir is: {self.target_dir}")
+
+
+
+
 
     def get_metadata(self):
         with open(self.path_to_archive, 'rb') as f:
@@ -136,7 +148,7 @@ class DecompressorInit:
             current_dict = current_dict[key]
         return current_dict
 
-    def input_decesion_tree(self, user_input):
+    def input_decision_tree(self, user_input):
         if user_input[0] == 'show' and len(user_input) == 1:
             return self.get_content_directory(self.metadata)
 
@@ -158,7 +170,9 @@ class DecompressorInit:
     def decompressor_init_main(self):
         print(DI_PROMPTS["dhelp"])
         self.get_path()
+        if not Av(self.path_to_archive, self.metadata).validate_archive():
+            self.decompressor_init_main()
         self.get_metadata()
         self.get_target_dir()
         user_input = self.get_response()
-        self.input_decesion_tree(user_input)
+        self.input_decision_tree(user_input)

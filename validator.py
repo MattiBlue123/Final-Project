@@ -1,4 +1,5 @@
 import os
+from helper_functions import hash_data
 
 
 class PathValidator:
@@ -113,3 +114,99 @@ class UnitLengthValidator:
         while not self.__is_valid_unit_length():
             self.unit_length = input("Enter a valid unit length: ")
         return int(self.unit_length)
+
+
+class ArchiveValidator:
+    """
+    Validates a given archive.
+    Checks if in valid format.
+    If it is, returns True. If not, tells what's wrong and returns False.
+    """
+
+    def __init__(self, archive, metadata):
+        self.archive = archive
+        self.metadata = metadata
+
+    def get_all_files_data(self, files_list):
+        """
+        for each file in the archive's metadata:
+        1. from metadata get the file's path in archive, file's pointer, file's header length, file's encoded size
+        2. convert file's path in archive and  to sha - 1, find file's
+        header in archive and check if matches.
+
+        3. if not, print the key of that file with appropriate notification
+        and :return False.
+        4. if all files are valid, :return: True
+        """
+        for key, value in self.metadata.items():
+            if isinstance(value, dict):
+                if value["type"] == "file":
+                    # creating a tuple for every file in the archive
+                    header_hash = hash_data(
+                        value["path in archive"].encode('utf-8'))
+                    (files_list.append(key, header_hash,
+                                       value["pointer"],
+                                       value["encoded size"],
+                                       value["header length"]))
+
+                elif value["type"] == "folder":
+                    self.get_all_files_data(files_list)
+        return files_list
+
+    def validate_metadata(self):
+        """
+        Validates that the metadata has all the necessary fields
+        :return: True if all fields are present, False otherwise
+
+        fields:
+            file_metadata["path in archive"] = path_in_archive
+            file_metadata["pointer"] = None
+            file_metadata["header length"] = None
+            file_metadata["encoded size"] = None
+            file_metadata["unit length"] = unit_length
+            file_metadata["data hash"] = None
+            file_metadata["original size"] = os.path.getsize(path)
+            file_metadata["original size"] = bytes_num
+            file_metadata["header length"] = header_length
+            file_metadata["encoded size"] = encoded_content_size
+            file_metadata["data hash"] = hashed_content
+        """
+        metadata = self.metadata.decode('utf-8')
+        required_keys = {
+        "path in archive": str,
+        "pointer": int,
+        "header length": int,
+        "encoded size": int,
+        "unit length": int,
+        "data hash": None,  # exists, no type check
+        "original size": int
+    }
+
+        for key, value in metadata.items():
+            if isinstance(value, dict):
+                if value["type"] == "file":
+                    for required_key, required_type in required_keys.items():
+                        if required_key not in value:
+                            print(f"Missing key in metadata: {required_key}")
+                            return False
+                        if required_type is not None and not isinstance(value[required_key], required_type):
+                            print(f"Invalid type for key {required_key}: expected {required_type}, got {type(value[required_key])}")
+                            return False
+        return True
+
+    def validate_archive(self):
+        all_files_list = self.get_all_files_data([])
+        with open(self.archive, 'rb') as f:
+            for file in all_files_list:
+                try:
+                    f.seek(file[2])
+                    f.seek(-(file[3] + file[4]), os.SEEK_CUR)
+                    if file[1] != f.read(file[4]):
+                        print(f"Invalid file in archive: {file[0]}")
+                        return False
+
+                except FileNotFoundError:
+                    print(f"Error validating content of file: {file[0]} in "
+                          f"archive {self.archive}")
+                    return False
+        return True

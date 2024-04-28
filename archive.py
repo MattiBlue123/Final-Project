@@ -1,6 +1,6 @@
-import os
 from config import FLAGS
 import json
+from helper_functions import make_unique_path
 class ArchiveCreator:
     """The Archive class is responsible for creating a compressed archive of
     the files in the target directory. The archive is created in the target."""
@@ -13,7 +13,6 @@ class ArchiveCreator:
         self.target_dir = target_dir
         self.archive_name = archive_name
 
-    def validate_archive(self):
 
     def process_metadata(self):
         """
@@ -37,15 +36,7 @@ class ArchiveCreator:
         # naming the archive file
         # making sure there isn't an existing file with the same name.
         # adding a number to the name if there is.
-        counter = None
-        while True:
-            suffix = f"({counter})" if counter is not None else ""
-            archive_name = f"{self.archive_name}_rle{suffix}"
-            archive_path = os.path.join(self.target_dir, archive_name)
-
-            if not os.path.exists(archive_path):
-                break
-            counter = 1 if counter is None else counter + 1
+        archive_path = make_unique_path(self.target_dir, self.archive_name)
 
         with open(archive_path, 'wb') as archive:
             archive.write(self.encoded_content)

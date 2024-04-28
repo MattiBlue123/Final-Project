@@ -1,6 +1,6 @@
 import struct
 import os
-from helper_functions import hash_data
+from helper_functions import hash_data, make_unique_path
 
 
 class RunLengthDecoder:
@@ -60,54 +60,6 @@ class RunLengthDecoder:
                 decoded_content_parts.append(unit * appearances_num)
 
         self.decoded_content = b''.join(decoded_content_parts)
-    # def content_decoder(self):
-    #
-    #     print("Decoding content")
-    #     with open(self.path_to_archive, 'rb') as f:
-    #         print(f"Reading content from {self.file_name}")
-    #         try:
-    #             f.seek(self.pointer)
-    #         except ValueError:
-    #             print(f"Error seeking for pointer in {self.file_name}")
-    #         try:
-    #             f.seek(-self.encoded_size, os.SEEK_CUR)
-    #         except ValueError:
-    #             print(f"Error finding content beginning"
-    #                   f" of {self.file_name}")
-    #         content = f.read(self.encoded_size)
-    #         print(f"Done reading content : {content}")  # working
-    #         print(f"{self.encoded_size % (self.unit_length + 1) != 0}")
-    #         extra_bytes = 0
-    #         if self.encoded_size % (self.unit_length + 1) != 0:
-    #             extra_bytes = self.encoded_size % (self.unit_length + 1)
-    #         print(f"Extra bytes: {extra_bytes}")
-    #
-    #         for i in range(0, self.encoded_size - extra_bytes,
-    #                        self.unit_length + 1):
-    #             print("inside loop")
-    #             appearances_num = struct.unpack('B', content[i:i + 1])[0]
-    #             print(type(appearances_num), appearances_num)
-    #             unit = content[i + 1:i + self.unit_length + 1]
-    #             print(unit)
-    #             self.decoded_content += unit * appearances_num
-    #             print(self.decoded_content)
-    #
-    #         if self.encoded_size % (self.unit_length + 1) != 0:
-    #             appearances_num = struct.unpack('B', content[
-    #                                                  self.encoded_size -
-    #                                                  extra_bytes:self.encoded_size - extra_bytes + 1])[
-    #                 0]
-    #
-    #             unit = content[self.encoded_size - extra_bytes + 1:]
-    #             self.decoded_content += unit * appearances_num
-
-    # def validate_header(self):
-    #     # validate the header
-    #     #  the encoding of the file header was:
-    #     #  header = hash_data(self.path_in_archive.encode('utf-8'))
-    #     if self.file_header != hash_data(self.path_in_archive):
-    #         raise ValueError(f"file {self.file_name} corrupted"
-    #                          f" - file's header is not valid")
 
     def validate_decoding_process(self):
         # validate the decoding process
@@ -130,7 +82,8 @@ class RunLengthDecoder:
         is_text = self._is_text()
         # Open the file in the appropriate mode
         mode = 'w' if is_text else 'wb'
-        with open(os.path.join(self.target_dir, self.file_name), mode) as f:
+        extracted_file_path = make_unique_path(self.target_dir, self.file_name)
+        with open(os.path.join(extracted_file_path), mode) as f:
             if is_text:
                 f.write(self.decoded_content.decode('utf-8'))
             else:

@@ -36,7 +36,6 @@ class Compressor:
                     print(f"general pointer updated to: {general_pointer}")
 
                 elif value["type"] == "folder":
-
                     (metadata[key],
                      all_encoded_content_list,
                      general_pointer) = \
@@ -48,7 +47,6 @@ class Compressor:
 
     def update_metadata(self, file_metadata, header_length,
                         encoded_content_size, hashed_content, bytes_num):
-        # encoded, header_length, encoded_size, hashed_content, original_size
         file_metadata["original size"] = bytes_num
         file_metadata["header length"] = header_length
         file_metadata["encoded size"] = encoded_content_size
