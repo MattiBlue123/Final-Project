@@ -69,8 +69,8 @@ class Compressor:
             self.metadata, [])
         encoded_content = b''.join(encoded_content)
         archive = ArchiveCreator(metadata, encoded_content, end_pointer,
-                                 self.target_dir, self.archive_name)
-        return archive.create_archive(add_flag)
+                                 self.target_dir, self.archive_name, add_flag)
+        return archive.create_archive()
 
 
 

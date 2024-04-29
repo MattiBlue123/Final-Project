@@ -1,5 +1,6 @@
 import os
 import re
+from helper_functions import zinput
 
 from helper_functions import hash_data
 
@@ -59,7 +60,7 @@ class PathValidator:
 
     def validate_path(self):
         while not (self.__is_valid_path()):
-            self.path = input("Enter valid path: ").strip('""')
+            self.path = zinput("Enter valid path: ").strip('""')
         return self.path
 
     def validate_path_in_archive(self, path_in_archive, general_metadata):
@@ -91,7 +92,7 @@ class TargetDirectoryValidator:
 
     def validate_target_directory(self):
         while not self.__is_valid_target_directory():
-            self.target_directory = input(
+            self.target_directory = zinput(
                 "Enter a valid target directory: ").strip('""')
         return self.target_directory
 
@@ -111,10 +112,10 @@ class UnitLengthValidator:
         return True
 
     def validate_unit_length(self):
-        if self.unit_length is "":
+        if self.unit_length == "":
             return ""
         while not self.__is_valid_unit_length():
-            self.unit_length = input("Enter a valid unit length: ")
+            self.unit_length = zinput("Enter a valid unit length: ")
         return int(self.unit_length)
 
 
@@ -129,7 +130,7 @@ class ArchiveValidator:
         self.archive = archive
         self.metadata = metadata
 
-    def get_all_files_data(self, files_list):
+    def get_all_files_data(self, files_list, current_metadata=None):
         """
         for each file in the archive's metadata:
         1. from metadata get the file's path in archive, file's pointer,
@@ -141,19 +142,22 @@ class ArchiveValidator:
         and :return False.
         4. if all files are valid, :return: True
         """
-        for key, value in self.metadata.items():
+        if current_metadata is None:
+            current_metadata = self.metadata
+
+        for key, value in current_metadata.items():
             if isinstance(value, dict):
                 if value["type"] == "file":
                     # creating a tuple for every file in the archive
                     header_hash = hash_data(
                         value["path in archive"].encode('utf-8'))
                     (files_list.append((key, header_hash,
-                                       value["pointer"],
-                                       value["encoded size"],
-                                       value["header length"])))
+                                        value["pointer"],
+                                        value["encoded size"],
+                                        value["header length"])))
 
                 elif value["type"] == "folder":
-                    self.get_all_files_data(files_list)
+                    self.get_all_files_data(files_list, value)
         return files_list
 
     def validate_metadata(self):

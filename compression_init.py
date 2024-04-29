@@ -8,12 +8,14 @@ from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
 
 class CompressorInit:
 
-    def __init__(self, target_dir='', added_file_path=None):
+    def __init__(self, target_dir='', added_file_path=None, add_flag=False):
         self.metadata = dict()
-        self.target_dir = ''
+        self.target_dir = target_dir
         self.unit_length = 0
         self.archive_name = ''
-        self.added_file_path = None
+        self.added_file_path = added_file_path
+        self.add_flag = add_flag
+
 
     def set_def_unit_length(self):
         unit_length = zinput(CI_PROMPTS["set default unit length"]).strip()
@@ -137,9 +139,10 @@ class CompressorInit:
                                                                 path_name)
         compressor = Compressor(self.metadata, self.target_dir,
                                 self.archive_name)
-        compressed_output = compressor.compress()
+        compressed_output = compressor.compress(self.add_flag)
+        print(f"compressed output: {compressed_output}")
         if compressed_output:
-            return
+            return compressed_output
         else:
             return
 

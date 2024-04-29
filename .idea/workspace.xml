@@ -5,16 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2e8fb633-2658-46e3-92e7-fe3548a44265" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/add_to_archive.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/add_to_archive.py" beforeDir="false" afterPath="$PROJECT_DIR$/add_to_archive.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/archive.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compression_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression_init.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/decompression.py" beforeDir="false" afterPath="$PROJECT_DIR$/decompression.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/decompression_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/decompression_init.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/funfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/funfile.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/helper_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/helper_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/validator.py" beforeDir="false" afterPath="$PROJECT_DIR$/validator.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -64,7 +63,7 @@
     &quot;Python.everything_validator.executor&quot;: &quot;Debug&quot;,
     &quot;Python.funfile.executor&quot;: &quot;Run&quot;,
     &quot;Python.helper_functions.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;Python.main_updated.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
@@ -125,6 +124,14 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="NONE" type="python-line">
+          <url>file://$PROJECT_DIR$/decompression_init.py</url>
+          <line>37</line>
+          <log-expression expression="with open(self.path_to_archive, 'rb') as f:&#10;                print(f&quot;Reading metadata from {self.path_to_archive}&quot;)&#10;                f.seek(-4, os.SEEK_END)&#10;                footer = f.read()&#10;&#10;                if footer != b'ZM\x05\x06':&#10;                    raise ValueError(&quot;Invalid archive, missing appropriate footer&quot;)&#10;&#10;                is_header = bytearray()&#10;&#10;                while f.tell() &gt; 0:  ## While not at the start of the file&#10;                    f.seek(-1, os.SEEK_CUR)  ## Move the pointer back 1 byte&#10;                    byte = f.read(1)  ## Read the byte&#10;                    is_header.insert(0, byte[&#10;                        0])  ## Add the byte to the start of the found sequence&#10;                    self.metadata_length += 1  ## Increment the header_length&#10;                    if len(is_header) &gt; 4:  ## If the found sequence is too long&#10;                        is_header.pop()  ## Remove the last byte&#10;                    if is_header == b'ZM\x01\x02':  ## If the found sequence matches the target sequence&#10;                        f.seek(3, os.SEEK_CUR)&#10;                        self.metadata_length -= 4&#10;                        metadata = f.read(&#10;                            self.metadata_length - 4)  ## avoid reading the footer&#10;                        metadata = metadata.decode('utf-8')&#10;                        self.metadata = json.loads(metadata)&#10;                        break&#10;                    f.seek(-1, os.SEEK_CUR)" language="Python" />
+          <option name="timeStamp" value="102" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">

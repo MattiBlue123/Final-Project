@@ -32,13 +32,8 @@ class DecompressorInit:
 
     def get_target_dir(self):
         target_dir = zinput("Please enter the target directory: ").strip('""')
-        target_dir = TdV(target_dir).validate_target_directory()
-        #  creating a file to extract the files to
-        target_dir_name = os.path.basename(self.path_to_archive)
-        self.target_dir = make_unique_path(target_dir, target_dir_name)
-        print(f"creating target dir: {self.target_dir} this is a unique path")
-        os.mkdir(self.target_dir)
-        print(f"now target dir is: {self.target_dir}")
+        self.target_dir = TdV(target_dir).validate_target_directory()
+
 
     def get_metadata(self):
         try:
@@ -122,6 +117,17 @@ class DecompressorInit:
         # If you have checked all keys without returning False, return True
         return True
 
+    def get_relevant_metadata(self, path):
+        path = parse_archive_path(path)
+        current_dict = self.metadata
+        for key in path:
+            if key in current_dict and isinstance(current_dict[key], dict):
+                current_dict = current_dict[key]
+            else:
+                return False
+        self.metadata = current_dict
+        return True
+
     def get_response(self):
         while True:
             response = zinput(DI_PROMPTS["get input"]).lower().split()
@@ -143,15 +149,6 @@ class DecompressorInit:
                     continue
             return response
 
-    def get_relevant_metadata(self, path):
-        path = parse_archive_path(path)
-        current_dict = self.metadata
-        for key in path:
-            if key in current_dict and isinstance(current_dict[key], dict):
-                current_dict = current_dict[key]
-            else:
-                return False
-        return current_dict
 
     def input_decision_tree(self, user_input):
         if user_input[0] == 'show' and len(user_input) == 1:
@@ -166,22 +163,25 @@ class DecompressorInit:
                 if not self.get_relevant_metadata(user_input[1]):
                     print("Invalid path in archive")
                     return True
-                decompressor = Decompressor(self.path_to_archive,
-                                            self.target_dir, self.metadata,
-                                            self.metadata_length)
-                decompressor.extract()
+
+            self.get_target_dir()
+            target_dir_name = os.path.basename(self.path_to_archive)
+            self.target_dir = make_unique_path(self.target_dir,
+                                               target_dir_name)
+            os.mkdir(self.target_dir)
+            decompressor = Decompressor(self.path_to_archive,
+                                        self.target_dir, self.metadata,
+                                        self.metadata_length)
+            decompressor.extract()
+
         if user_input[0] == 'back':
             return False
         if user_input[0] == 'add':
-            add_to_archive = AtA(self.path_to_archive, self.metadata,
-                                 self.metadata_length, self.target_dir)
+            add_to_archive = AtA(self.path_to_archive, self.metadata)
             add_to_archive.add_file_to_archive()
 
-
-
-
     def decompressor_init_main(self):
-        print(DI_PROMPTS["dhelp"])
+        print(DI_PROMPTS["--dhelp"])
         while True:
             self.get_path()
             if not self.get_metadata():
@@ -191,7 +191,6 @@ class DecompressorInit:
                 time.sleep(3)
                 continue
             break
-        self.get_target_dir()
         while True:
             user_input = self.get_response()
             if not self.input_decision_tree(user_input):

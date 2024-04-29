@@ -1,7 +1,6 @@
 import os
 import hashlib
-from config import FLAGS
-import re
+from config import FLAGS, MAIN_PROMPTS
 
 
 def hash_data(data):
@@ -27,6 +26,8 @@ def zinput(prompt):
         elif user_input.lower() == "back":
             FLAGS["back_flag"] = True
             return ""
+        elif user_input.lower() == "--help":
+            print(MAIN_PROMPTS["--help"])
         else:
             return user_input
 
