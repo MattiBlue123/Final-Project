@@ -53,7 +53,7 @@ class Compressor:
         file_metadata["data hash"] = hashed_content
         return file_metadata
 
-    def compress(self):
+    def compress(self, add_flag=False):
         """
         Create metadata for a file or directory.
 
@@ -70,6 +70,7 @@ class Compressor:
         encoded_content = b''.join(encoded_content)
         archive = ArchiveCreator(metadata, encoded_content, end_pointer,
                                  self.target_dir, self.archive_name)
-        return archive.create_archive()
+        return archive.create_archive(add_flag)
+
 
 

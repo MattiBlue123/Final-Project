@@ -8,11 +8,12 @@ from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
 
 class CompressorInit:
 
-    def __init__(self):
+    def __init__(self, target_dir='', added_file_path=None):
         self.metadata = dict()
         self.target_dir = ''
         self.unit_length = 0
         self.archive_name = ''
+        self.added_file_path = None
 
     def set_def_unit_length(self):
         unit_length = zinput(CI_PROMPTS["set default unit length"]).strip()
@@ -103,9 +104,12 @@ class CompressorInit:
                                              path_in_archive)
 
     def compressor_init_main(self):
-        print(CI_PROMPTS["chelp"])  # will need to update this
+        print(CI_PROMPTS["--chelp"])  # will need to update this
         self.set_def_unit_length()
-        path = self.get_path()
+        if not self.added_file_path:
+            path = self.get_path()
+        else:
+            path = self.added_file_path
         self.archive_name = os.path.basename(path)
         if not self.unit_length:
             unit_length = self.get_unit_length()
@@ -113,7 +117,8 @@ class CompressorInit:
             unit_length = self.unit_length
         self.metadata[self.archive_name] =\
             self.create_metadata(path, unit_length, self.archive_name)
-        self.get_target_dir()
+        if self.target_dir == '':
+            self.get_target_dir()
         while True:
             path = zinput(
                 CI_PROMPTS["another path"]).strip('""')
@@ -132,4 +137,9 @@ class CompressorInit:
                                                                 path_name)
         compressor = Compressor(self.metadata, self.target_dir,
                                 self.archive_name)
-        compressor.compress()
+        compressed_output = compressor.compress()
+        if compressed_output:
+            return
+        else:
+            return
+

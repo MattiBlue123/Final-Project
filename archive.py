@@ -1,6 +1,7 @@
 from config import FLAGS
 import json
 from helper_functions import make_unique_path
+from add_to_archive import AddToArchive as AtA
 class ArchiveCreator:
     """The Archive class is responsible for creating a compressed archive of
     the files in the target directory. The archive is created in the target."""
@@ -30,8 +31,9 @@ class ArchiveCreator:
         footer = b'ZM\x05\x06'
         return header + self.metadata + footer
 
-    def create_archive(self):
+    def create_archive(self, add_flag=False):
         # Create an archive of the compressed files
+
         self.encoded_content = self.encoded_content + self.process_metadata()
         # naming the archive file
         # making sure there isn't an existing file with the same name.
@@ -40,6 +42,10 @@ class ArchiveCreator:
 
         with open(archive_path, 'wb') as archive:
             archive.write(self.encoded_content)
-        print(f"Archive created and saved to: {archive_path}")
-        FLAGS["back flag"] = True
+        if not add_flag:
+            print(f"Archive created and saved to: {archive_path}")
+            FLAGS["back flag"] = True
+        else:
+            return (archive_path, self.encoded_content,
+                    self.metadata)
 

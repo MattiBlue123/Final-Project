@@ -1,11 +1,14 @@
 import json
 import os
+import time
+
 from config import DI_PROMPTS, DI_POSSIBLE_ACTIONS
-from helper_functions import (zinput, validate_path_format, parse_archive_path,
+from helper_functions import (zinput, parse_archive_path,
                               make_unique_path)
 from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
                        ArchiveValidator as Av)
 from decompression import Decompressor
+from add_to_archive import AddToArchive as AtA
 
 
 class DecompressorInit:
@@ -37,43 +40,42 @@ class DecompressorInit:
         os.mkdir(self.target_dir)
         print(f"now target dir is: {self.target_dir}")
 
-
-
-
-
     def get_metadata(self):
-        with open(self.path_to_archive, 'rb') as f:
-            print(f"Reading metadata from {self.path_to_archive}")
-            f.seek(-4, os.SEEK_END)
-            footer = f.read()
+        try:
+            with open(self.path_to_archive, 'rb') as f:
+                print(f"Reading metadata from {self.path_to_archive}")
+                f.seek(-4, os.SEEK_END)
+                footer = f.read()
 
-            if footer != b'ZM\x05\x06':
-                raise ValueError("Invalid archive")
+                if footer != b'ZM\x05\x06':
+                    raise ValueError("Invalid archive, missing appropriate footer")
 
-            is_header = bytearray()
+                is_header = bytearray()
 
-            while f.tell() > 0:  # While not at the start of the file
-                f.seek(-1, os.SEEK_CUR)  # Move the pointer back 1 byte
-                byte = f.read(1)  # Read the byte
-                is_header.insert(0, byte[
-                    0])  # Add the byte to the start of the found sequence
-                self.metadata_length += 1  # Increment the header_length
-                if len(is_header) > 4:  # If the found sequence
-                    # is too long
-                    is_header.pop()  # Remove the last byte
-                if is_header == b'ZM\x01\x02':  # If the found sequence
-                    # matches the target sequence
-                    f.seek(3, os.SEEK_CUR)
-                    self.metadata_length -= 4
-                    metadata = f.read(
-                        self.metadata_length - 4)  # avoid reading the footer
-                    metadata = metadata.decode('utf-8')
-                    self.metadata = json.loads(metadata)
-                    break
-                f.seek(-1, os.SEEK_CUR)
+                while f.tell() > 0:  # While not at the start of the file
+                    f.seek(-1, os.SEEK_CUR)  # Move the pointer back 1 byte
+                    byte = f.read(1)  # Read the byte
+                    is_header.insert(0, byte[
+                        0])  # Add the byte to the start of the found sequence
+                    self.metadata_length += 1  # Increment the header_length
+                    if len(is_header) > 4:  # If the found sequence is too long
+                        is_header.pop()  # Remove the last byte
+                    if is_header == b'ZM\x01\x02':  # If the found sequence matches the target sequence
+                        f.seek(3, os.SEEK_CUR)
+                        self.metadata_length -= 4
+                        metadata = f.read(
+                            self.metadata_length - 4)  # avoid reading the footer
+                        metadata = metadata.decode('utf-8')
+                        self.metadata = json.loads(metadata)
+                        break
+                    f.seek(-1, os.SEEK_CUR)
 
-            if 'metadata' not in locals():
-                raise ValueError("Invalid archive")
+                if 'metadata' not in locals():
+                    raise ValueError("Invalid archive - metadata invalid")
+            return True
+        except Exception as e:
+            print(f"Error reading metadata: {e}")
+            return False
 
     def get_content_directory(self, dictionary, path='', start=''):
         for key, value in dictionary.items():
@@ -99,7 +101,7 @@ class DecompressorInit:
         return self.path_to_archive
 
     def validate_path_in_archive(self, archive_path_input):
-        if not validate_path_format(archive_path_input):
+        if not Av.validate_path_in_archive_format(archive_path_input):
             return False
         # Parse the archive path into a list of keys
         parsed_path = parse_archive_path(archive_path_input)
@@ -129,8 +131,8 @@ class DecompressorInit:
             if response[0] not in DI_POSSIBLE_ACTIONS:
                 print("Invalid response")
                 continue
-            if response[0] == 'dhelp':
-                print(DI_PROMPTS["dhelp"])
+            if response[0] == '--dhelp':
+                print(DI_PROMPTS["--dhelp"])
                 continue
             if response[0] == 'show' or response[0] == 'extract':
                 # validate path in archive
@@ -145,7 +147,10 @@ class DecompressorInit:
         path = parse_archive_path(path)
         current_dict = self.metadata
         for key in path:
-            current_dict = current_dict[key]
+            if key in current_dict and isinstance(current_dict[key], dict):
+                current_dict = current_dict[key]
+            else:
+                return False
         return current_dict
 
     def input_decision_tree(self, user_input):
@@ -156,23 +161,39 @@ class DecompressorInit:
             return self.get_content_directory(self.metadata,
                                               start=user_input[1])
         elif user_input[0] == 'extract':
-            try:
-                if len(user_input) == 2:  # extract specific files
-                    # get relevant metadata only for the files to extract
-                    self.metadata = self.get_relevant_metadata(user_input[1])
+            if len(user_input) == 2:  # extract specific files
+                # get relevant metadata only for the files to extract
+                if not self.get_relevant_metadata(user_input[1]):
+                    print("Invalid path in archive")
+                    return True
                 decompressor = Decompressor(self.path_to_archive,
                                             self.target_dir, self.metadata,
                                             self.metadata_length)
                 decompressor.extract()
-            except Exception as e:
-                print(f"Error extracting files: {e}")
+        if user_input[0] == 'back':
+            return False
+        if user_input[0] == 'add':
+            add_to_archive = AtA(self.path_to_archive, self.metadata,
+                                 self.metadata_length, self.target_dir)
+            add_to_archive.add_file_to_archive()
+
+
+
 
     def decompressor_init_main(self):
         print(DI_PROMPTS["dhelp"])
-        self.get_path()
-        if not Av(self.path_to_archive, self.metadata).validate_archive():
-            self.decompressor_init_main()
-        self.get_metadata()
+        while True:
+            self.get_path()
+            if not self.get_metadata():
+                time.sleep(3)
+                continue
+            if not Av(self.path_to_archive, self.metadata).validate_archive():
+                time.sleep(3)
+                continue
+            break
         self.get_target_dir()
-        user_input = self.get_response()
-        self.input_decision_tree(user_input)
+        while True:
+            user_input = self.get_response()
+            if not self.input_decision_tree(user_input):
+                break
+

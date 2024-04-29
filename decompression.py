@@ -11,14 +11,13 @@ class Decompressor:
         self.metadata_length = metadata_length
 
     def extract_file(self, file_metadata, file_name, target_dir):
-        print(file_metadata)
-        print(file_name)
-        print(target_dir)
-        print(self.path_to_archive)
-        decoder = RunLengthDecoder(file_metadata, file_name, target_dir,
-                                   self.path_to_archive)
-
-        decoder.extract()
+        try:
+            decoder = RunLengthDecoder(file_metadata, file_name, target_dir,
+                                       self.path_to_archive)
+            decoder.extract()
+        except FileNotFoundError:
+            print(f"Error extracting file: {file_name}\n "
+                  f"file might be corrupted\n")
 
     def extract_all_files(self, directory_metadata, target_dir):
         print(f"init extract all files: {directory_metadata}\n"
@@ -37,9 +36,5 @@ class Decompressor:
                     self.extract_file(value, key, target_dir)
 
     def extract(self):
-        try:
-            # extract all files
-            self.extract_all_files(self.metadata, self.target_dir)
-        except Exception as e:
-            print(f"Error extracting files: {self.path_to_archive}")
-            return False
+        # extract all files
+        self.extract_all_files(self.metadata, self.target_dir)

@@ -23,8 +23,7 @@ class Main:
         elif user_input == 'd':
             d = DecompressorInit()
             d.decompressor_init_main()
-        elif user_input == 'info':
-            pass
+
 
     @staticmethod
     def get_user_input():
@@ -47,9 +46,7 @@ class Main:
             print(MAIN_PROMPTS["--help"])
             response = self.get_user_input()
             self.main_decision_tree(response)
-            if FLAGS["back_flag"]:
-                FLAGS["back_flag"] = False  # Reset the flag
-                break
+
 
 
 if __name__ == '__main__':

@@ -39,12 +39,7 @@ def parse_archive_path(archive_path):
     return files
 
 
-def validate_path_format(path):
-    pattern = r"^/([\w\.\-\_ ]+/)*[\w\.\-\_ ]+$"
-    if re.match(pattern, path):
-        return True
-    else:
-        return False
+
 
 
 def create_file_metadata(path, unit_length, path_in_archive):
