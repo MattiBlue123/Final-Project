@@ -31,18 +31,6 @@ def zinput(prompt):
         else:
             return user_input
 
-
-def parse_archive_path(archive_path):
-    # Remove leading and trailing slashes
-    archive_path = archive_path.strip('/')
-    # Split the path into a list of files/directories
-    files = archive_path.split('/')
-    return files
-
-
-
-
-
 def create_file_metadata(path, unit_length, path_in_archive):
     """
     Create metadata for a file.

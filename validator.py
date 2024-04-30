@@ -1,7 +1,7 @@
 import os
 import re
 from helper_functions import zinput
-
+from config import FILE_HEADER_LENGTH
 from helper_functions import hash_data
 
 
@@ -29,7 +29,8 @@ class PathValidator:
         # checks if the directory is valid for archiving
         if self.is_directory_empty():
             raise ValueError(
-                f"The specified directory {self.path} is empty. Can't add it to the archive")
+                f"The specified directory {self.path} is empty."
+                f" Can't add it to the archive")
 
         for name in os.listdir(self.path):
             file_path = os.path.join(self.path, name)
@@ -62,15 +63,6 @@ class PathValidator:
         while not (self.__is_valid_path()):
             self.path = zinput("Enter valid path: ").strip('""')
         return self.path
-
-    def validate_path_in_archive(self, path_in_archive, general_metadata):
-        for key, value in general_metadata.items():
-            if key == "path in_archive" and value == path_in_archive:
-                return True
-            elif isinstance(value, dict):
-                if self.validate_path_in_archive(path_in_archive, value):
-                    return True
-        return False
 
 
 class TargetDirectoryValidator:
@@ -127,7 +119,7 @@ class ArchiveValidator:
     """
 
     def __init__(self, archive, metadata):
-        self.archive = archive
+        self.archive_path = archive
         self.metadata = metadata
 
     def get_all_files_data(self, files_list, current_metadata=None):
@@ -153,8 +145,7 @@ class ArchiveValidator:
                         value["path in archive"].encode('utf-8'))
                     (files_list.append((key, header_hash,
                                         value["pointer"],
-                                        value["encoded size"],
-                                        value["header length"])))
+                                        value["encoded size"])))
 
                 elif value["type"] == "folder":
                     self.get_all_files_data(files_list, value)
@@ -207,19 +198,21 @@ class ArchiveValidator:
 
     def validate_archive(self):
         all_files_list = self.get_all_files_data([])
-        with open(self.archive, 'rb') as f:
+        with open(self.archive_path, 'rb') as f:
             for file in all_files_list:
                 try:
+                    # seeking end of file pointer
                     f.seek(file[2])
-                    f.seek(-(file[3] + file[4]), os.SEEK_CUR)
-                    if file[1] != f.read(file[4]):
+                    # seeking back to the start of the file's header
+                    f.seek(-(file[3] + FILE_HEADER_LENGTH), os.SEEK_CUR)
+                    if file[1] != f.read(FILE_HEADER_LENGTH):
                         raise ValueError(f"Invalid header for file: {file[0]}")
                 except ValueError as ve:
                     print(ve)
                     return False
                 except FileNotFoundError:
                     print(f"Error validating content of file: {file[0]} in "
-                          f"archive {self.archive}")
+                          f"archive {self.archive_path}")
                     return False
         return True
 
@@ -230,3 +223,42 @@ class ArchiveValidator:
             return True
         else:
             return False
+
+    # def validate_path_in_archive(self, path_in_archive, general_metadata):
+    #     for key, value in general_metadata.items():
+    #         if key == "path in_archive" and value == path_in_archive:
+    #             return True
+    #         elif isinstance(value, dict):
+    #             if self.validate_path_in_archive(path_in_archive, value):
+    #                 return True
+    #     return False
+
+    def validate_path_in_archive(self, path_in_archive_input):
+        if not self.validate_path_in_archive_format(path_in_archive_input):
+            return False
+        # Parse the archive path into a list of keys
+        parsed_path = self.parse_path_in_archive(path_in_archive_input)
+
+        # Start with the root of the dictionary
+        current_dict = self.metadata
+
+        # For each key in the parsed path
+        for key in parsed_path:
+            # make sure key exist and is a file\folder
+            if key in current_dict and isinstance(current_dict[key], dict):
+                # if it's a folder, move to the next level of the dictionary
+                current_dict = current_dict[key]
+            else:
+                # if file/folder not found in directory, raise exception
+                return False
+
+        # If you have checked all keys without returning False, return True
+        return True
+
+    @staticmethod
+    def parse_path_in_archive(archive_path):
+        # Remove leading and trailing slashes
+        archive_path = archive_path.strip('/')
+        # Split the path into a list of files/directories
+        files = archive_path.split('/')
+        return files

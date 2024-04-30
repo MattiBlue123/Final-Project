@@ -14,7 +14,7 @@ class Decompressor:
         try:
             decoder = RunLengthDecoder(file_metadata, file_name, target_dir,
                                        self.path_to_archive)
-            decoder.extract()
+            decoder.decode_file_to_extract()
         except FileNotFoundError:
             print(f"Error extracting file: {file_name}\n "
                   f"file might be corrupted\n")

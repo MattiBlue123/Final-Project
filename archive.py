@@ -43,7 +43,8 @@ class ArchiveCreator:
         # naming the archive file
         # making sure there isn't an existing file with the same name.
         # adding a number to the name if there is.
-        archive_path = make_unique_path(self.target_dir, self.archive_name)
+        archive_path = make_unique_path(self.target_dir, self.archive_name +
+                                        "_compressed")
 
         with open(archive_path, 'wb') as archive:
             archive.write(self.encoded_content)

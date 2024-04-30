@@ -1,7 +1,7 @@
 import struct
 import os
 from helper_functions import hash_data, make_unique_path
-
+from config import FILE_HEADER_LENGTH
 
 class RunLengthDecoder:
 
@@ -11,23 +11,21 @@ class RunLengthDecoder:
         self.target_dir = target_dir
         self.path_to_archive = path_to_archive
         self.pointer = self.file_metadata["pointer"]
-        self.header_length = self.file_metadata["header length"]
         self.encoded_size = self.file_metadata["encoded size"]
         self.unit_length = self.file_metadata["unit length"]
         self.data_hash = self.file_metadata["data hash"]
         self.original_size = self.file_metadata["original size"]
         self.decoded_content = b''
         self.path_in_archive = self.file_metadata["path in archive"]
-        # self.header = self.get_header()
         self.decoded_size = 0
 
-    # def get_header(self):
-    #     ### I have to fix this
-    #     with open(self.path_to_archive, 'rb') as f:
-    #         f.seek(self.pointer)
-    #         header = f.read(self.header_length)
-    #         header = header.decode('utf-8')
-    #     return header
+    def get_header(self):
+        ### I have to fix this
+        with open(self.path_to_archive, 'rb') as f:
+            f.seek(self.pointer)
+            header = f.read(FILE_HEADER_LENGTH)
+            header = header.decode('utf-8')
+        return header
 
     def content_decoder(self):
         decoded_content_parts = []
@@ -77,7 +75,7 @@ class RunLengthDecoder:
         except UnicodeDecodeError:
             return False  # is not text
 
-    def extract(self):
+    def decode_file_to_extract(self):
         self.content_decoder()
         is_text = self._is_text()
         # Open the file in the appropriate mode

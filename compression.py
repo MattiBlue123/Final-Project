@@ -1,5 +1,6 @@
 from encoder import RunLengthEncoder
 from archive import ArchiveCreator
+from config import FILE_HEADER_LENGTH
 
 class Compressor:
 
@@ -12,13 +13,9 @@ class Compressor:
         encoder = RunLengthEncoder(metadata["origin path"],
                                    metadata["unit length"],
                                    metadata["path in archive"])
-        rle_return_vals = encoder.encode()
+        rle_return_vals = encoder.rle_encode()
         encoded_content = rle_return_vals[0]
-        print(f"header length: {rle_return_vals[1]}")
-        print(f"encoded size: {rle_return_vals[2]}")
-        print(f"pointer before the file: {pointer}")
-        metadata["pointer"] = rle_return_vals[1] + rle_return_vals[2] + pointer
-        print(f"pointer after the file: {metadata['pointer']}")
+        metadata["pointer"] = rle_return_vals[1] + FILE_HEADER_LENGTH + pointer
         metadata = self.update_metadata(metadata, *rle_return_vals[1:])
         return metadata, encoded_content, metadata["pointer"]
 
@@ -33,7 +30,6 @@ class Compressor:
                         self.file_compressor(metadata[key], general_pointer)
 
                     all_encoded_content_list.append(encoded_content)
-                    print(f"general pointer updated to: {general_pointer}")
 
                 elif value["type"] == "folder":
                     (metadata[key],
@@ -45,10 +41,9 @@ class Compressor:
 
         return metadata, all_encoded_content_list, general_pointer
 
-    def update_metadata(self, file_metadata, header_length,
-                        encoded_content_size, hashed_content, bytes_num):
+    def update_metadata(self, file_metadata, encoded_content_size,
+                        hashed_content, bytes_num):
         file_metadata["original size"] = bytes_num
-        file_metadata["header length"] = header_length
         file_metadata["encoded size"] = encoded_content_size
         file_metadata["data hash"] = hashed_content
         return file_metadata

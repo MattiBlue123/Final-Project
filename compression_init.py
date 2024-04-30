@@ -24,9 +24,17 @@ class CompressorInit:
             self.unit_length = unit_length
 
     @staticmethod
-    def get_path():
-        path = Pv(zinput(CI_PROMPTS["get path"]).strip('""')).validate_path()
-        return path
+    def get_path(first=False):
+        if first:
+            path = Pv(zinput(CI_PROMPTS["get path"]).strip('""')).validate_path()
+            return path
+        else:
+            path = zinput(CI_PROMPTS["another path"]).strip('""')
+            if path == 'ok':
+                return 'ok'
+            else:
+                Pv(path).validate_path()
+
 
     @staticmethod
     def get_unit_length():
@@ -55,7 +63,6 @@ class CompressorInit:
         file_metadata["origin path"] = path
         file_metadata["path in archive"] = path_in_archive
         file_metadata["pointer"] = None
-        file_metadata["header length"] = None
         file_metadata["encoded size"] = None
         file_metadata["unit length"] = unit_length
         file_metadata["data hash"] = None
@@ -109,7 +116,7 @@ class CompressorInit:
         print(CI_PROMPTS["--chelp"])  # will need to update this
         self.set_def_unit_length()
         if not self.added_file_path:
-            path = self.get_path()
+            path = self.get_path(True)
         else:
             path = self.added_file_path
         self.archive_name = os.path.basename(path)
@@ -122,13 +129,11 @@ class CompressorInit:
         if self.target_dir == '':
             self.get_target_dir()
         while True:
-            path = zinput(
-                CI_PROMPTS["another path"]).strip('""')
-            if path.lower() == 'ok':
+            path = self.get_path()
+            if path == 'ok':
                 break
             else:
                 # validate the paths
-                path = Pv(path).validate_path()
                 if not self.unit_length:
                     unit_length = self.get_unit_length()
                 else:
@@ -140,9 +145,9 @@ class CompressorInit:
         compressor = Compressor(self.metadata, self.target_dir,
                                 self.archive_name)
         compressed_output = compressor.compress(self.add_flag)
-        print(f"compressed output: {compressed_output}")
         if compressed_output:
             return compressed_output
         else:
+
             return
 

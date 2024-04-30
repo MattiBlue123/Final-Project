@@ -48,6 +48,5 @@ CI_PROMPTS = \
 
 CI_POSSIBLE_ACTIONS = ["--help", "back", "exit"]
 MAX_COUNT = 255
-
-
+FILE_HEADER_LENGTH = 20
 

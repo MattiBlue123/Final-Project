@@ -46,8 +46,6 @@ class RunLengthEncoder:
                     count = 1
                     curr_unit = next_unit
 
-
-
             else:  # sequence of identical units ended
                 encoded_unit = struct.pack('B', count) + curr_unit
                 encoded.append(encoded_unit)
@@ -61,14 +59,13 @@ class RunLengthEncoder:
 
         return b''.join(encoded), encoded_content_size
 
-    def encode(self):
+    def rle_encode(self):
         hashed_content = hash_data(self.content)
         hashed_content = str(hashed_content)
         header = hash_data(self.path_in_archive.encode('utf-8'))
         encoded, encoded_content_size = self.content_encoder(header)
 
-        return (encoded, len(header), encoded_content_size,
-                hashed_content, self.bytes_num)
+        return encoded, encoded_content_size, hashed_content, self.bytes_num
 
 
 

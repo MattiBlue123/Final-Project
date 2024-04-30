@@ -3,8 +3,7 @@ import os
 import time
 
 from config import DI_PROMPTS, DI_POSSIBLE_ACTIONS
-from helper_functions import (zinput, parse_archive_path,
-                              make_unique_path)
+from helper_functions import zinput, make_unique_path
 from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
                        ArchiveValidator as Av)
 from decompression import Decompressor
@@ -18,6 +17,7 @@ class DecompressorInit:
         self.metadata_length = 0
         self.metadata = {}
         self.target_dir = ''
+        self.av = None
 
     def get_path(self):
         while True:
@@ -85,40 +85,8 @@ class DecompressorInit:
                     value, dict):
                 print(new_path)
 
-    def archive_path_validation(self):
-        while True:
-            self.path_to_archive = zinput(
-                "please input the path of the archive file: ").strip('""')
-            if not Pv(self.path_to_archive).validate_path():
-                print("Invalid path")
-                continue
-            break
-        return self.path_to_archive
-
-    def validate_path_in_archive(self, archive_path_input):
-        if not Av.validate_path_in_archive_format(archive_path_input):
-            return False
-        # Parse the archive path into a list of keys
-        parsed_path = parse_archive_path(archive_path_input)
-
-        # Start with the root of the dictionary
-        current_dict = self.metadata
-
-        # For each key in the parsed path
-        for key in parsed_path:
-            # make sure key exist and is a file\folder
-            if key in current_dict and isinstance(current_dict[key], dict):
-                # if it's a folder, move to the next level of the dictionary
-                current_dict = current_dict[key]
-            else:
-                # if file/folder not found in directory, raise exception
-                return False
-
-        # If you have checked all keys without returning False, return True
-        return True
-
     def get_relevant_metadata(self, path):
-        path = parse_archive_path(path)
+        path = Av.parse_path_in_archive(path)
         current_dict = self.metadata
         for key in path:
             if key in current_dict and isinstance(current_dict[key], dict):
@@ -130,7 +98,12 @@ class DecompressorInit:
 
     def get_response(self):
         while True:
-            response = zinput(DI_PROMPTS["get input"]).lower().split()
+            response = zinput(DI_PROMPTS["get input"])
+            if ' ' in response:
+                command, path = response.split(' ', 1)
+                response = [command, path]
+            else:
+                response = response.split()
             if len(response) == 0 or len(response) > 2:
                 print("Invalid response")
                 continue
@@ -144,7 +117,7 @@ class DecompressorInit:
                 # validate path in archive
                 if len(response) == 1:  # path hasn't been provided
                     return response
-                if not self.validate_path_in_archive(response[1]):
+                if not self.av.validate_path_in_archive(response[1]):
                     print("Invalid path in archive or path format")
                     continue
             return response
@@ -152,20 +125,27 @@ class DecompressorInit:
 
     def input_decision_tree(self, user_input):
         if user_input[0] == 'show' and len(user_input) == 1:
-            return self.get_content_directory(self.metadata)
+            self.get_content_directory(self.metadata)
+            return True
 
         elif user_input[0] == 'show' and len(user_input) == 2:
-            return self.get_content_directory(self.metadata,
-                                              start=user_input[1])
+            self.get_content_directory(self.metadata,
+                                              start=user_input[1].lstrip('/'))
+            return True
         elif user_input[0] == 'extract':
             if len(user_input) == 2:  # extract specific files
                 # get relevant metadata only for the files to extract
+                print(self.metadata)
                 if not self.get_relevant_metadata(user_input[1]):
                     print("Invalid path in archive")
                     return True
+                print(self.metadata)
 
             self.get_target_dir()
             target_dir_name = os.path.basename(self.path_to_archive)
+            if "_compressed" in target_dir_name:
+                target_dir_name = target_dir_name.replace("_compressed",
+                                                          "_extracted")
             self.target_dir = make_unique_path(self.target_dir,
                                                target_dir_name)
             os.mkdir(self.target_dir)
@@ -187,7 +167,8 @@ class DecompressorInit:
             if not self.get_metadata():
                 time.sleep(3)
                 continue
-            if not Av(self.path_to_archive, self.metadata).validate_archive():
+            self.av = Av(self.path_to_archive, self.metadata)
+            if not self.av.validate_archive():
                 time.sleep(3)
                 continue
             break
