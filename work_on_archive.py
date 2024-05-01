@@ -140,7 +140,6 @@ class WorkOnArchive:
                     print("Invalid path in archive")
                     return True
                 print(self.metadata)
-            print("now extracting")
             self.get_target_dir()
             target_dir_name = os.path.basename(self.path_to_archive)
             if "_compressed" in target_dir_name:
@@ -152,6 +151,7 @@ class WorkOnArchive:
             decompressor = Decompressor(self.path_to_archive,
                                         self.target_dir, self.metadata,
                                         self.metadata_length)
+            print("now extracting")
             decompressor.extract()
 
         if user_input[0] == 'back':

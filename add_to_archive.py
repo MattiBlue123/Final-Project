@@ -90,7 +90,7 @@ class AddToArchive:
 
     def add_file_to_archive(self):
         # get the path of the file to be added to the archive
-        self.added_file_path = Ci.get_path()
+        self.added_file_path = Ci.get_path(True)
         # init the compressor
         c = Ci(self.archive_path, self.added_file_path, True)
         # following step returns the encoded_content, metadata

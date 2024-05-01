@@ -164,10 +164,6 @@ class ArchiveValidator:
 
                     header_in_metadata = file[1]
                     header_in_metadata = ast.literal_eval(header_in_metadata)
-                    print(type(header_in_metadata))
-                    print(f"the header: {file[1]}")
-                    print(type(header_found))
-                    print(f"header found: {header_found}")
                     if header_in_metadata != header_found:
                         raise ValueError(f"Invalid header for file: {file[0]}")
                 except ValueError as ve:

@@ -14,7 +14,7 @@ MAIN_POSSIBLE_ACTIONS = ["c", "w", "exit", "--help", "info", "back"]
 WOA_POSSIBLE_ACTIONS = ["show", "exit", "extract", "whelp", "--help", "add"]
 
 WOA_PROMPTS = \
-    {'--dhelp': 'Now in archive work mode.\n'
+    {'--whelp': 'Now in archive work mode.\n'
            'Possible actions are:\n'
            '"exit" - to exit the program completely\n'
            '"show" - to show the content of the archive\n'
