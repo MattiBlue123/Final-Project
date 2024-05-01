@@ -1,7 +1,8 @@
+from GUI import CompressionInfoGUI
 from encoder import RunLengthEncoder
 from archive import ArchiveCreator
 from config import FILE_HEADER_LENGTH
-from compression_info import timer_decorator, compression_info
+from compression_info import timer_decorator, overall_timer_decorator, compression_info
 
 
 class Compressor:
@@ -50,14 +51,19 @@ class Compressor:
         file_metadata["data hash"] = hashed_content
         return file_metadata
 
+    @overall_timer_decorator
     def compress(self, add_flag=False):
         metadata, encoded_content, end_pointer = self.compress_all_files(
             self.metadata, [])
         encoded_content = b''.join(encoded_content)
         archive = ArchiveCreator(metadata, encoded_content, end_pointer,
                                  self.target_dir, self.archive_name, add_flag)
-        compression_info.print_info()  # print the compression info after all files have been compressed
+
+        self.compression_stats_gui(compression_info)
         return archive.create_archive()
 
 
 
+    def compression_stats_gui(self, compression_info):
+        gui = CompressionInfoGUI(compression_info)
+        gui.mainloop()

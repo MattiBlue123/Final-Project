@@ -142,7 +142,10 @@ class CompressorInit:
         compressor = Compressor(self.metadata, self.target_dir,
                                 self.archive_name)
         compressed_output = compressor.compress(self.add_flag)
+
         if compressed_output:
             return compressed_output
         else:
             return
+
+
