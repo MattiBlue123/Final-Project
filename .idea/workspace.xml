@@ -5,12 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2e8fb633-2658-46e3-92e7-fe3548a44265" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/GUI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/archive.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compression_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression_info.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compression_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression_init.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,6 +119,14 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="NONE" type="python-line">
+          <url>file://$PROJECT_DIR$/compression_info.py</url>
+          <line>24</line>
+          <log-expression expression="= time.time()&#10;        runtime = end_time - start_time&#10;&#10;        ## Add the overall compression runtime to the files_compression_info list&#10;        compression_info.add_info(&quot;OVERALL COMPRESSION RUNTIME:&quot;, runtime, &quot;&quot;)&#10;&#10;        ## Call the compression_stats_gui method with the updated compression_info&#10;        self.compression_stats_gui(compression_info)&#10;&#10;        return result&#10;&#10;    return wrapper" language="Python" />
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">

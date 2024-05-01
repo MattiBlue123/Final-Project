@@ -1,5 +1,6 @@
 import time
 from pathlib import Path
+from GUI import CompressionInfoGUI
 
 
 class CompressionInfo:
@@ -14,11 +15,15 @@ class CompressionInfo:
             print(f"File: {info[0]}, Compression Time: {info[1]} seconds, "
                   f"Compression Diff: {info[2]} bytes")
 
+    def compression_stats_gui(self):
+        gui = CompressionInfoGUI(self)
+        gui.mainloop()
+
 
 compression_info = CompressionInfo()
 
 
-def timer_decorator(func):
+def file_compressing_timer_decorator(func):
     def wrapper(self, metadata, pointer=0):
         file_path = Path(metadata["origin path"])
         file_name = f"{file_path.parent.name}/{file_path.stem}"
@@ -26,29 +31,25 @@ def timer_decorator(func):
         result = func(self, metadata, pointer)
         end_time = time.time()
         runtime = end_time - start_time
-        # Calculate the "compressed_by" value
         compressed_by = metadata["original size"] - metadata["encoded size"]
         if compressed_by < 0:
             compressed_by = "expanded by " + str(abs(compressed_by))
         else:
             compressed_by = "compressed by " + str(compressed_by)
-        # Append the file name, runtime, and "compressed_by" value to the list
         compression_info.add_info(file_name, runtime, compressed_by)
         return result
 
     return wrapper
 
 
-def overall_timer_decorator(func):
+def archiving_timer_decorator(func):
     def wrapper(self, *args, **kwargs):
         start_time = time.time()
         result = func(self, *args, **kwargs)
         end_time = time.time()
         runtime = end_time - start_time
-
-        # Add the overall compression runtime to the files_compression_info list
         compression_info.add_info("OVERALL COMPRESSION RUNTIME:", runtime, "")
-        # compression_info.run_gui()
+        compression_info.compression_stats_gui()
         return result
 
     return wrapper
