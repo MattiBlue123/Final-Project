@@ -1,5 +1,5 @@
 from helper_functions import zinput
-from WorkOnArchive import WorkOnArchive
+from work_on_archive import WorkOnArchive
 from compression_init import CompressorInit
 from config import *
 

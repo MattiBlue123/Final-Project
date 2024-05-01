@@ -1,6 +1,8 @@
 from encoder import RunLengthEncoder
 from archive import ArchiveCreator
 from config import FILE_HEADER_LENGTH
+from compression_info import timer_decorator, compression_info
+
 
 class Compressor:
 
@@ -9,6 +11,7 @@ class Compressor:
         self.target_dir = target_dir
         self.archive_name = archive_name
 
+    @timer_decorator
     def file_compressor(self, metadata, pointer=0):
         encoder = RunLengthEncoder(metadata.pop("origin path"),
                                    metadata["unit length"])
@@ -53,6 +56,7 @@ class Compressor:
         encoded_content = b''.join(encoded_content)
         archive = ArchiveCreator(metadata, encoded_content, end_pointer,
                                  self.target_dir, self.archive_name, add_flag)
+        compression_info.print_info()  # print the compression info after all files have been compressed
         return archive.create_archive()
 
 

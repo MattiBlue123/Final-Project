@@ -1,6 +1,7 @@
 import os
 import hashlib
 from config import FLAGS, MAIN_PROMPTS
+import time
 
 
 def hash_data(data):
@@ -31,75 +32,20 @@ def zinput(prompt):
         else:
             return user_input
 
-def create_file_metadata(path, unit_length, path_in_archive):
-    """
-    Create metadata for a file.
 
-    Parameters:
-    path (str): The path of the file.
-    unit_length (int): The unit length.
-    path_in_archive (str): The path in the archive.
+# Initialize the list
+files_compression_info = []
 
-    Returns:
-    dict: The metadata of the file.
-    """
-    file_metadata = dict()
-    file_metadata["type"] = "file"
-    file_metadata["origin path"] = path
-    file_metadata["path in archive"] = path_in_archive
-    file_metadata["pointer"] = None
-    file_metadata["header length"] = None
-    file_metadata["encoded size"] = None
-    file_metadata["unit length"] = unit_length
-    file_metadata["data hash"] = None
-    file_metadata["original size"] = os.path.getsize(path)
-    return file_metadata
-
-
-def create_directory_metadata(path, unit_length, path_in_archive):
-    """
-    Create metadata for a directory.
-
-    Parameters:
-    path (str): The path of the directory.
-    unit_length (int): The unit length.
-    path_in_archive (str): The path in the archive.
-
-    Returns:
-    dict: The metadata of the directory.
-    """
-    directory_metadata = dict()
-    directory_metadata["type"] = "folder"
-    for file in os.listdir(path):
-        file_path = os.path.join(path, file)
-        if os.path.isdir(file_path):
-            directory_metadata[file] = create_directory_metadata(
-                file_path, unit_length, path_in_archive + "/" + file)
-        else:
-            directory_metadata[file] = create_file_metadata(
-                file_path, unit_length, path_in_archive + "/" + file)
-    return directory_metadata
-
-
-def create_metadata(path, unit_length, path_in_archive=""):
-    """
-    Create metadata for a file or directory.
-
-    Parameters:
-    path (str): The path of the file or directory.
-    unit_length (int): The unit length.
-    path_in_archive (str): The path in the archive.
-
-    Returns:
-    dict: The metadata of the file or directory.
-    """
-    if os.path.isdir(path):
-        return create_directory_metadata(path, unit_length,
-                                         path_in_archive)
-    else:
-        return create_file_metadata(path, unit_length,
-                                    path_in_archive)
-
+def timer_decorator(func):
+    def wrapper(self, metadata, pointer=0):
+        start_time = time.time()
+        result = func(self, metadata, pointer)
+        end_time = time.time()
+        runtime = end_time - start_time
+        # Append the file name and runtime to the list
+        files_compression_info.append((metadata.get("origin path", "unknown file"), runtime))
+        return result
+    return wrapper
 
 def make_unique_path(target_dir, archive_name):
     """
