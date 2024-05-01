@@ -2,7 +2,7 @@ import json
 import os
 import time
 
-from config import DI_PROMPTS, DI_POSSIBLE_ACTIONS
+from config import WOA_PROMPTS, WOA_POSSIBLE_ACTIONS
 from helper_functions import zinput, make_unique_path
 from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
                        ArchiveValidator as Av)
@@ -10,7 +10,7 @@ from decompression import Decompressor
 from add_to_archive import AddToArchive as AtA
 
 
-class DecompressorInit:
+class WorkOnArchive:
 
     def __init__(self):
         self.path_to_archive = ""
@@ -34,7 +34,6 @@ class DecompressorInit:
         target_dir = zinput("Please enter the target directory: ").strip('""')
         self.target_dir = TdV(target_dir).validate_target_directory()
 
-
     def get_metadata(self):
         try:
             with open(self.path_to_archive, 'rb') as f:
@@ -43,7 +42,8 @@ class DecompressorInit:
                 footer = f.read()
 
                 if footer != b'ZM\x05\x06':
-                    raise ValueError("Invalid archive, missing appropriate footer")
+                    raise ValueError(
+                        "Invalid archive, missing appropriate footer")
 
                 is_header = bytearray()
 
@@ -86,19 +86,20 @@ class DecompressorInit:
                 print(new_path)
 
     def get_relevant_metadata(self, path):
-        path = Av.parse_path_in_archive(path)
+        path = self.av.parse_path_in_archive(path)
         current_dict = self.metadata
         for key in path:
             if key in current_dict and isinstance(current_dict[key], dict):
                 current_dict = current_dict[key]
             else:
                 return False
-        self.metadata = current_dict
+        # Create a new dictionary with the filename as the key
+        self.metadata = {path[-1]: current_dict}
         return True
 
     def get_response(self):
         while True:
-            response = zinput(DI_PROMPTS["get input"])
+            response = zinput(WOA_PROMPTS["get input"])
             if ' ' in response:
                 command, path = response.split(' ', 1)
                 response = [command, path]
@@ -107,11 +108,11 @@ class DecompressorInit:
             if len(response) == 0 or len(response) > 2:
                 print("Invalid response")
                 continue
-            if response[0] not in DI_POSSIBLE_ACTIONS:
+            if response[0] not in WOA_POSSIBLE_ACTIONS:
                 print("Invalid response")
                 continue
-            if response[0] == '--dhelp':
-                print(DI_PROMPTS["--dhelp"])
+            if response[0] == '--whelp':
+                print(WOA_PROMPTS["--whelp"])
                 continue
             if response[0] == 'show' or response[0] == 'extract':
                 # validate path in archive
@@ -122,7 +123,6 @@ class DecompressorInit:
                     continue
             return response
 
-
     def input_decision_tree(self, user_input):
         if user_input[0] == 'show' and len(user_input) == 1:
             self.get_content_directory(self.metadata)
@@ -130,7 +130,7 @@ class DecompressorInit:
 
         elif user_input[0] == 'show' and len(user_input) == 2:
             self.get_content_directory(self.metadata,
-                                              start=user_input[1].lstrip('/'))
+                                       start=user_input[1].lstrip('/'))
             return True
         elif user_input[0] == 'extract':
             if len(user_input) == 2:  # extract specific files
@@ -140,7 +140,7 @@ class DecompressorInit:
                     print("Invalid path in archive")
                     return True
                 print(self.metadata)
-
+            print("now extracting")
             self.get_target_dir()
             target_dir_name = os.path.basename(self.path_to_archive)
             if "_compressed" in target_dir_name:
@@ -160,20 +160,19 @@ class DecompressorInit:
             add_to_archive = AtA(self.path_to_archive, self.metadata)
             add_to_archive.add_file_to_archive()
 
-    def decompressor_init_main(self):
-        print(DI_PROMPTS["--dhelp"])
+    def work_on_archive_main(self):
+        print(WOA_PROMPTS["--whelp"])
         while True:
             self.get_path()
             if not self.get_metadata():
-                time.sleep(3)
+                time.sleep(1)
                 continue
             self.av = Av(self.path_to_archive, self.metadata)
             if not self.av.validate_archive():
-                time.sleep(3)
+                time.sleep(1)
                 continue
             break
         while True:
             user_input = self.get_response()
             if not self.input_decision_tree(user_input):
                 break
-

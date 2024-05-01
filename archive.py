@@ -1,6 +1,7 @@
 from config import FLAGS
 import json
 from helper_functions import make_unique_path
+from time import sleep
 
 
 class ArchiveCreator:
@@ -24,6 +25,7 @@ class ArchiveCreator:
         bytes: The processed metadata.
         """
         # Convert metadata to JSON and encode to bytes
+        print(self.metadata)
         self.metadata = json.dumps(self.metadata)
         self.metadata = self.metadata.encode('utf-8')
 
@@ -49,5 +51,6 @@ class ArchiveCreator:
         with open(archive_path, 'wb') as archive:
             archive.write(self.encoded_content)
         if not self.add_flag:
-            print(f"Archive created and saved to: {archive_path}")
+            print(f"Archive created and saved to: {archive_path}\n\n")
+            sleep(1)
             FLAGS["back flag"] = True

@@ -7,13 +7,12 @@ from config import MAX_COUNT
 
 class RunLengthEncoder:
 
-    def __init__(self, path, unit_length, path_in_archive):
+    def __init__(self, path, unit_length):
         self.path = path
         self.file_name = Path(path).stem
         self.unit_length = unit_length
         self.content = self.open_file()
         self.bytes_num = os.path.getsize(self.path)
-        self.path_in_archive = path_in_archive
 
     def open_file(self):
         with open(self.path, 'rb') as f:
@@ -27,7 +26,9 @@ class RunLengthEncoder:
 
         if self.unit_length >= self.bytes_num:
             encoded.append(struct.pack('B', 1) + self.content)
-            return b''.join(encoded)
+            encoded = b''.join(encoded)
+            encoded_content_size = len(encoded)
+            return encoded, encoded_content_size
 
         curr_unit = self.content[0:self.unit_length]
         for i in range(self.unit_length, self.bytes_num, self.unit_length):
@@ -40,7 +41,6 @@ class RunLengthEncoder:
                 count += 1
                 if count == MAX_COUNT + 1:
                     encoded_unit = struct.pack('B', MAX_COUNT) + curr_unit
-                    print(f"encoded unit: {encoded_unit}")
                     encoded.append(encoded_unit)
                     encoded_content_size += len(encoded_unit)
                     count = 1
@@ -61,11 +61,9 @@ class RunLengthEncoder:
 
     def rle_encode(self):
         hashed_content = hash_data(self.content)
-        hashed_content = str(hashed_content)
-        header = hash_data(self.path_in_archive.encode('utf-8'))
-        encoded, encoded_content_size = self.content_encoder(header)
+        encoded, encoded_content_size = self.content_encoder(hashed_content)
 
-        return encoded, encoded_content_size, hashed_content, self.bytes_num
+        return encoded, encoded_content_size, str(hashed_content), self.bytes_num
 
 
 

@@ -1,8 +1,8 @@
+import ast
 import os
 import re
 from helper_functions import zinput
 from config import FILE_HEADER_LENGTH
-from helper_functions import hash_data
 
 
 class PathValidator:
@@ -141,8 +141,7 @@ class ArchiveValidator:
             if isinstance(value, dict):
                 if value["type"] == "file":
                     # creating a tuple for every file in the archive
-                    header_hash = hash_data(
-                        value["path in archive"].encode('utf-8'))
+                    header_hash = value["data hash"]
                     (files_list.append((key, header_hash,
                                         value["pointer"],
                                         value["encoded size"])))
@@ -150,51 +149,6 @@ class ArchiveValidator:
                 elif value["type"] == "folder":
                     self.get_all_files_data(files_list, value)
         return files_list
-
-    def validate_metadata(self):
-        """
-        Validates that the metadata has all the necessary fields
-        :return: True if all fields are present, False otherwise
-
-        fields:
-            file_metadata["path in archive"] = path_in_archive
-            file_metadata["pointer"] = None
-            file_metadata["header length"] = None
-            file_metadata["encoded size"] = None
-            file_metadata["unit length"] = unit_length
-            file_metadata["data hash"] = None
-            file_metadata["original size"] = os.path.getsize(path)
-            file_metadata["original size"] = bytes_num
-            file_metadata["header length"] = header_length
-            file_metadata["encoded size"] = encoded_content_size
-            file_metadata["data hash"] = hashed_content
-        """
-        metadata = self.metadata.decode('utf-8')
-        required_keys = {
-            "path in archive": str,
-            "pointer": int,
-            "header length": int,
-            "encoded size": int,
-            "unit length": int,
-            "data hash": None,  # exists, no type check
-            "original size": int
-        }
-
-        for key, value in metadata.items():
-            if isinstance(value, dict):
-                if value["type"] == "file":
-                    for required_key, required_type in required_keys.items():
-                        if required_key not in value:
-                            print(f"Missing key in metadata: {required_key}")
-                            return False
-                        if required_type is not None and not isinstance(
-                                value[required_key], required_type):
-                            print(
-                                f"Invalid type for key {required_key}:"
-                                f" expected {required_type},"
-                                f" got {type(value[required_key])}")
-                            return False
-        return True
 
     def validate_archive(self):
         all_files_list = self.get_all_files_data([])
@@ -205,7 +159,16 @@ class ArchiveValidator:
                     f.seek(file[2])
                     # seeking back to the start of the file's header
                     f.seek(-(file[3] + FILE_HEADER_LENGTH), os.SEEK_CUR)
-                    if file[1] != f.read(FILE_HEADER_LENGTH):
+                    # header found is bytes string that contains
+                    header_found = f.read(FILE_HEADER_LENGTH)
+
+                    header_in_metadata = file[1]
+                    header_in_metadata = ast.literal_eval(header_in_metadata)
+                    print(type(header_in_metadata))
+                    print(f"the header: {file[1]}")
+                    print(type(header_found))
+                    print(f"header found: {header_found}")
+                    if header_in_metadata != header_found:
                         raise ValueError(f"Invalid header for file: {file[0]}")
                 except ValueError as ve:
                     print(ve)
@@ -213,6 +176,9 @@ class ArchiveValidator:
                 except FileNotFoundError:
                     print(f"Error validating content of file: {file[0]} in "
                           f"archive {self.archive_path}")
+                    return False
+                except OSError:
+                    print(f"Error Archive's metadata in wrong format")
                     return False
         return True
 
@@ -223,15 +189,6 @@ class ArchiveValidator:
             return True
         else:
             return False
-
-    # def validate_path_in_archive(self, path_in_archive, general_metadata):
-    #     for key, value in general_metadata.items():
-    #         if key == "path in_archive" and value == path_in_archive:
-    #             return True
-    #         elif isinstance(value, dict):
-    #             if self.validate_path_in_archive(path_in_archive, value):
-    #                 return True
-    #     return False
 
     def validate_path_in_archive(self, path_in_archive_input):
         if not self.validate_path_in_archive_format(path_in_archive_input):

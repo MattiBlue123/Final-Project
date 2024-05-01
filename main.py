@@ -1,5 +1,5 @@
 from helper_functions import zinput
-from decompression_init import DecompressorInit
+from WorkOnArchive import WorkOnArchive
 from compression_init import CompressorInit
 from config import *
 
@@ -20,15 +20,15 @@ class Main:
         if user_input == 'c':
             c = CompressorInit()
             c.compressor_init_main()
-        elif user_input == 'd':
-            d = DecompressorInit()
-            d.decompressor_init_main()
+        elif user_input == 'w':
+            w = WorkOnArchive()
+            w.work_on_archive_main()
 
 
     @staticmethod
     def get_user_input():
         while True:
-            response = zinput(MAIN_PROMPTS["get input"]).lower().strip()
+            response = zinput(MAIN_PROMPTS["get input"])
             if len(response) == 0 or len(response) > 1:
                 print("Invalid response1")
                 continue

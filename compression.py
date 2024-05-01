@@ -10,9 +10,8 @@ class Compressor:
         self.archive_name = archive_name
 
     def file_compressor(self, metadata, pointer=0):
-        encoder = RunLengthEncoder(metadata["origin path"],
-                                   metadata["unit length"],
-                                   metadata["path in archive"])
+        encoder = RunLengthEncoder(metadata.pop("origin path"),
+                                   metadata["unit length"])
         rle_return_vals = encoder.rle_encode()
         encoded_content = rle_return_vals[0]
         metadata["pointer"] = rle_return_vals[1] + FILE_HEADER_LENGTH + pointer
@@ -49,17 +48,6 @@ class Compressor:
         return file_metadata
 
     def compress(self, add_flag=False):
-        """
-        Create metadata for a file or directory.
-
-        Parameters:
-        path (str): The path of the file or directory.
-        unit_length (int): The unit length.
-        path_in_archive (str): The path in the archive.
-
-        Returns:
-        dict: The metadata of the file or directory.
-        """
         metadata, encoded_content, end_pointer = self.compress_all_files(
             self.metadata, [])
         encoded_content = b''.join(encoded_content)
