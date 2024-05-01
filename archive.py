@@ -25,7 +25,12 @@ class ArchiveCreator:
         bytes: The processed metadata.
         """
         # Convert metadata to JSON and encode to bytes
-        self.metadata = json.dumps(self.metadata)
+        print(self.metadata)
+        print(type(self.metadata))
+        # self.metadata = json.dumps(self.metadata)
+        self.metadata = str(self.metadata)
+        print(self.metadata)
+        print(type(self.metadata))
         self.metadata = self.metadata.encode('utf-8')
 
         if not self.add_flag:

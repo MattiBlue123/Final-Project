@@ -141,8 +141,8 @@ class ArchiveValidator:
             if isinstance(value, dict):
                 if value["type"] == "file":
                     # creating a tuple for every file in the archive
-                    header_hash = value["data hash"]
-                    (files_list.append((key, header_hash,
+                    # header_hash = value["data hash"] removed from file list
+                    (files_list.append((key,
                                         value["pointer"],
                                         value["encoded size"])))
 
@@ -151,31 +151,31 @@ class ArchiveValidator:
         return files_list
 
     def validate_archive(self):
-        all_files_list = self.get_all_files_data([])
-        with open(self.archive_path, 'rb') as f:
-            for file in all_files_list:
-                try:
-                    # seeking end of file pointer
-                    f.seek(file[2])
-                    # seeking back to the start of the file's header
-                    f.seek(-(file[3] + FILE_HEADER_LENGTH), os.SEEK_CUR)
-                    # header found is bytes string that contains
-                    header_found = f.read(FILE_HEADER_LENGTH)
-
-                    header_in_metadata = file[1]
-                    header_in_metadata = ast.literal_eval(header_in_metadata)
-                    if header_in_metadata != header_found:
-                        raise ValueError(f"Invalid header for file: {file[0]}")
-                except ValueError as ve:
-                    print(ve)
-                    return False
-                except FileNotFoundError:
-                    print(f"Error validating content of file: {file[0]} in "
-                          f"archive {self.archive_path}")
-                    return False
-                except OSError:
-                    print(f"Error Archive's metadata in wrong format")
-                    return False
+        # all_files_list = self.get_all_files_data([])
+        # with open(self.archive_path, 'rb') as f:
+        #     for file in all_files_list:
+        #         try:
+        #             # seeking end of file pointer
+        #             f.seek(file[2])
+        #             # seeking back to the start of the file's header
+        #             f.seek(-(file[3] + FILE_HEADER_LENGTH), os.SEEK_CUR)
+        #             # header found is bytes string that contains
+        #             header_found = f.read(FILE_HEADER_LENGTH)
+        #
+        #             header_in_metadata = file[1]
+        #             header_in_metadata = ast.literal_eval(header_in_metadata)
+        #             if header_in_metadata != header_found:
+        #                 raise ValueError(f"Invalid header for file: {file[0]}")
+        #         except ValueError as ve:
+        #             print(ve)
+        #             return False
+        #         except FileNotFoundError:
+        #             print(f"Error validating content of file: {file[0]} in "
+        #                   f"archive {self.archive_path}")
+        #             return False
+        #         except OSError:
+        #             print(f"Error Archive's metadata in wrong format")
+        #             return False
         return True
 
     @staticmethod

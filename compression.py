@@ -47,7 +47,7 @@ class Compressor:
                         hashed_content, bytes_num):
         file_metadata["original size"] = bytes_num
         file_metadata["encoded size"] = encoded_content_size
-        file_metadata["data hash"] = hashed_content
+        # file_metadata["data hash"] = hashed_content
         return file_metadata
 
     @archiving_timer_decorator

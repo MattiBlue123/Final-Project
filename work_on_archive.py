@@ -61,7 +61,8 @@ class WorkOnArchive:
                         metadata = f.read(
                             self.metadata_length - 4)  # avoid reading the footer
                         metadata = metadata.decode('utf-8')
-                        self.metadata = json.loads(metadata)
+                        self.metadata = eval(metadata)
+                        # self.metadata = json.loads(metadata)
                         break
                     f.seek(-1, os.SEEK_CUR)
 
@@ -132,6 +133,7 @@ class WorkOnArchive:
             self.get_content_directory(self.metadata,
                                        start=user_input[1].lstrip('/'))
             return True
+
         elif user_input[0] == 'extract':
             if len(user_input) == 2:  # extract specific files
                 # get relevant metadata only for the files to extract
@@ -140,6 +142,7 @@ class WorkOnArchive:
                     print("Invalid path in archive")
                     return True
                 print(self.metadata)
+
             self.get_target_dir()
             target_dir_name = os.path.basename(self.path_to_archive)
             if "_compressed" in target_dir_name:

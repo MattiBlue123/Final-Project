@@ -65,7 +65,7 @@ class CompressorInit:
         file_metadata["pointer"] = None
         file_metadata["encoded size"] = None
         file_metadata["unit length"] = unit_length
-        file_metadata["data hash"] = None
+        # file_metadata["data hash"] = None
         file_metadata["original size"] = os.path.getsize(path)
         return file_metadata
 

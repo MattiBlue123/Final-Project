@@ -1,12 +1,13 @@
 import struct
 import os
 from helper_functions import hash_data, make_unique_path
+# import ast
 from config import FILE_HEADER_LENGTH
-import ast
 
 class RunLengthDecoder:
 
     def __init__(self, file_metadata, file_name, target_dir, path_to_archive):
+        self.header_hash = None
         self.file_metadata = file_metadata
         self.file_name = file_name
         self.target_dir = target_dir
@@ -14,11 +15,10 @@ class RunLengthDecoder:
         self.pointer = self.file_metadata["pointer"]
         self.encoded_size = self.file_metadata["encoded size"]
         self.unit_length = self.file_metadata["unit length"]
-        self.data_hash = self.file_metadata["data hash"]
+        # self.data_hash = self.file_metadata["data hash"]
         self.original_size = self.file_metadata["original size"]
         self.decoded_content = b''
         self.decoded_size = 0
-
 
     def get_appearances_num(self, content, extra_bytes):
         es = self.encoded_size
@@ -37,7 +37,8 @@ class RunLengthDecoder:
         try:
             with open(self.path_to_archive, 'rb') as f:
                 f.seek(self.pointer)
-                f.seek(-self.encoded_size, os.SEEK_CUR)
+                f.seek(-(self.encoded_size + FILE_HEADER_LENGTH), os.SEEK_CUR)
+                self.header_hash = f.read(FILE_HEADER_LENGTH)
                 content = f.read(self.encoded_size)
                 extra_bytes = 0
                 if self.encoded_size % (self.unit_length + 1) != 0:
@@ -74,12 +75,17 @@ class RunLengthDecoder:
 
         self.decoded_content = b''.join(decoded_content_parts)
 
-
     def validate_decoding_process(self):
         # validate the decoding process
         after_decoding_hash = hash_data(self.decoded_content)
-        original_data_hash = ast.literal_eval(self.data_hash)
-        if original_data_hash != after_decoding_hash:
+        print(type(self.header_hash))
+        print(f"Original hash: {self.header_hash}")
+        print(type(after_decoding_hash))
+        print(f"Decoded hash: {after_decoding_hash}")
+
+
+        # original_data_hash = ast.literal_eval(self.data_hash)
+        if self.header_hash != after_decoding_hash:
             raise ValueError(f" Data corrupted - hash mismatch")
         if self.original_size != self.decoded_size:
             raise ValueError(f" Data corrupted -"
