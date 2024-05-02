@@ -7,7 +7,7 @@ class TestCompressorInit(unittest.TestCase):
     def test_compressor_init_main(self, mock_zinput):
         # Arrange
         mock_zinput.side_effect = [
-            '1',  # unit length
+            '2',  # unit length
             r"C:\Users\zohar\OneDrive\Desktop\Test Cases\folder",  # path
             r"C:\Users\zohar\OneDrive\Desktop\open",  # target directory
             "ok"  # no more paths

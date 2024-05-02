@@ -3,17 +3,17 @@ from work_on_archive import WorkOnArchive
 from compression_init import CompressorInit
 from config import *
 
-
 class Main:
-
+    """
+    This class is the main class of the program. It runs the main decision tree
+    """
     def main_decision_tree(self, user_input):
         """
         :param user_input:
         "c" - to compress
-        "d" - to extract (decompress)
+        "w" - to work on an existing archive (extract, add, show)
         "info" - to get info about an archive
         "--help" - to see this message again
-        "back" - to go back to the main menu
         "exit" - to exit the program completely
         :return:
         """
@@ -27,6 +27,10 @@ class Main:
 
     @staticmethod
     def get_user_input():
+        """
+        This function gets the user input and validates it
+        :return:
+        """
         while True:
             response = zinput(MAIN_PROMPTS["get input"])
             if len(response) == 0 or len(response) > 1:
@@ -44,7 +48,9 @@ class Main:
             # say hello to user, explain rules
             print(MAIN_PROMPTS["greeting"])
             print(MAIN_PROMPTS["--help"])
+            # get user input
             response = self.get_user_input()
+            # run main decision tree
             self.main_decision_tree(response)
 
 

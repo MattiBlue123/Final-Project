@@ -19,6 +19,13 @@ class RunLengthDecoder:
         self.decoded_size = 0
 
     def get_appearances_num(self, content, extra_bytes):
+        """
+        Get the number of appearances of a unit in the content.
+        This code run ones, and it's just for the sake of the cleaner coder
+        :param content: The content to be decoded.
+        :param extra_bytes: The number of extra bytes in the content.
+        :return: The number of appearances of a unit in the content.
+        """
         es = self.encoded_size
         content_slice = content[es - extra_bytes:es - extra_bytes + 1]
         unpacked_content = struct.unpack('B', content_slice)
@@ -74,7 +81,10 @@ class RunLengthDecoder:
         self.decoded_content = b''.join(decoded_content_parts)
 
     def validate_decoding_process(self):
-        # validate the decoding process
+        """
+        Validate the decoding process by checking
+         the hash of the decoded content and its size.
+        """
         after_decoding_hash = hash_data(self.decoded_content)
         if self.header_hash != after_decoding_hash:
             raise ValueError(f" Data corrupted - hash mismatch")
@@ -83,6 +93,11 @@ class RunLengthDecoder:
                              f" content has changed")
 
     def _is_text(self):
+        """
+        Check if the decoded content is text.
+
+        :return: True if the decoded content is text, False otherwise.
+        """
         # Try to decode a portion of the content as text
         try:
             self.decoded_content[:1024].decode('utf-8')
@@ -91,6 +106,12 @@ class RunLengthDecoder:
             return False  # is not text
 
     def decode_file_to_extract(self):
+        """
+        Decode the file to be extracted.
+         Read and prepare the content, decode it,
+         validate the decoding process,
+         and save the decoded content to a file in the target directory.
+        """
         try:
             content, extra_bytes = self.read_and_prepare_content()
             self.decode_content(content, extra_bytes)

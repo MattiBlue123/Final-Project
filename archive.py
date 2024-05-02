@@ -18,17 +18,12 @@ class ArchiveCreator:
 
     def process_metadata(self):
         """
-        Process the metadata for JSON serialization.
-
+        Process the metadata to be added to the archive as binary data.
         Returns:
         bytes: The processed metadata.
         """
-        # Convert metadata to JSON and encode to bytes
-        print(self.metadata)
-        print(type(self.metadata))
+        # Convert metadata to string and encode to bytes
         self.metadata = str(self.metadata)
-        print(self.metadata)
-        print(type(self.metadata))
         self.metadata = self.metadata.encode('utf-8')
 
         if not self.add_flag:
@@ -36,9 +31,15 @@ class ArchiveCreator:
             header = b'ZM\x01\x02'
             footer = b'ZM\x05\x06'
             return header + self.metadata + footer
+        # this is meant so that while adding to an existing archive,
+        # the metadata will not have the header and footer.
         return self.metadata
 
-    def create_archive(self, ):
+    def create_archive(self):
+        """
+        Create an archive of the compressed files in the target directory.
+        :return:
+        """
         # Create an archive of the compressed files
         self.metadata = self.process_metadata()
         if self.add_flag:
@@ -49,7 +50,7 @@ class ArchiveCreator:
         # adding a number to the name if there is.
         archive_path = make_unique_path(self.target_dir, self.archive_name +
                                         "_compressed")
-
+        # saving the archive to the target directory
         with open(archive_path, 'wb') as archive:
             archive.write(self.encoded_content)
         if not self.add_flag:

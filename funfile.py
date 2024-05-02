@@ -1,1 +1,0 @@
-{"|Text2|": {"type": "folder", "|easy test.txt|": {"type": "file", "pointer": 22, "encoded size": 2, "unit length": 1, "original size": 11}}}

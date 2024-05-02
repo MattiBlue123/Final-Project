@@ -7,6 +7,11 @@ from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
 
 
 class CompressorInit:
+    """
+    The class for initializing the compression process, getting the necessary
+    information from the user and creating the metadata for the files to be
+    compressed.
+    """
 
     def __init__(self, target_dir='', added_file_path=None, add_flag=False):
         self.metadata = dict()
@@ -90,9 +95,7 @@ class CompressorInit:
                 directory_metadata["|" + file + "|"] = \
                     (self.create_directory_metadata(file_path, unit_length))
 
-                # directory_metadata[file] = \
             else:
-                # directory_metadata[file] = \
                 directory_metadata["|" + file + "|"] = \
                     (self.create_file_metadata(file_path, unit_length))
         return directory_metadata
@@ -115,23 +118,35 @@ class CompressorInit:
             return self.create_file_metadata(path, unit_length)
 
     def compressor_init_main(self):
-        print(CI_PROMPTS["--chelp"])  # will need to update this
+        """
+        The main method for initializing the compression process.
+        :return:
+        """
+        # explains about the compressor
+        print(CI_PROMPTS["chelp"])
+        # set the default unit length
         self.set_def_unit_length()
+        # get the path of the first file or directory
         if not self.added_file_path:
             path = self.get_path(True)
         else:
             path = self.added_file_path
+        # get the archive name
         self.archive_name = os.path.basename(path)
         if not self.unit_length:
             unit_length = self.get_unit_length()
         else:
             unit_length = self.unit_length
 
+        # we add || to the name for later use in the archive opening process
         self.metadata["|"+self.archive_name+"|"] = \
             self.create_metadata(path, unit_length)
+
+        # get the target directory
         if self.target_dir == '':
             self.get_target_dir()
         while True:
+            # to add several files or directories
             path = self.get_path()
             if path == 'ok':
                 break
@@ -145,6 +160,7 @@ class CompressorInit:
                 # self.metadata[path_name] =\
                 self.metadata["|" + path_name + "|"] =\
                     self.create_metadata(path, unit_length)
+        # compress the data
         compressor = Compressor(self.metadata, self.target_dir,
                                 self.archive_name)
         compressed_output = compressor.compress(self.add_flag)

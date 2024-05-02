@@ -1,3 +1,8 @@
+"""
+config file for the RLE Compressor software
+"""
+
+
 MAIN_PROMPTS = \
     {"get input": "Please enter the action you would like to perform: ",
      "greeting": "Welcome to the RLE Compressor software.\n",
@@ -7,9 +12,11 @@ Possible actions are:
 "w" - work on existing archive (extract, show content, add data)
 "exit" - to exit the program completely
 "--help" - to see this message again
+
+In every mode you will be guided how to proceed.
 """}
 
-MAIN_POSSIBLE_ACTIONS = ["c", "w", "exit", "--help", "info", "back"]
+MAIN_POSSIBLE_ACTIONS = ["c", "w", "exit", "--help", "info"]
 
 WOA_POSSIBLE_ACTIONS = ["show", "exit", "extract", "whelp", "--help", "add"]
 
@@ -32,7 +39,7 @@ CI_PROMPTS = \
     {"get input": "Please enter the action you would like to perform: ",
      "get ul": "Please enter the unit length: ",
      "get path": "Please enter the path of the data you want to compress: ",
-     "--chelp": """
+     "chelp": """
      Welcome to the Compressor
      First, you will be asked if you want a different unit length for each 
      path, or a default unit length for all paths.
@@ -46,7 +53,7 @@ CI_PROMPTS = \
                                    'or press "Enter" to skip: ',
      "another path": "Enter another path or type 'ok' to continue: "}
 
-CI_POSSIBLE_ACTIONS = ["--help", "back", "exit"]
+CI_POSSIBLE_ACTIONS = ["--help", "exit"]
 MAX_COUNT = 255
 FILE_HEADER_LENGTH = 20
 

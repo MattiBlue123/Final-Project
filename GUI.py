@@ -5,8 +5,17 @@ from tkinter import ttk, PhotoImage, filedialog
 
 
 class CompressionInfoGUI(tk.Tk):
+    """
+    The CompressionInfoGUI class is responsible for creating a GUI
+     that displays information about file compression.
+    """
 
     def __init__(self, compression_info):
+        """
+        Initialize the CompressionInfoGUI with the compression information.
+
+        :param compression_info: The information about file compression.
+        """
         super().__init__()
         self.compression_info = compression_info
         self.tree = None
@@ -18,11 +27,18 @@ class CompressionInfoGUI(tk.Tk):
         self.create_download_button()
 
     def create_download_button(self):
+        """
+        Create a button that allows the user to download the data
+        displayed in the treeview.
+        """
         download_button = ttk.Button(self, text="Download Data",
                                      command=self.download_treeview_data)
         download_button.pack()
 
     def download_treeview_data(self):
+        """
+        Download the data displayed in the treeview as a CSV file.
+        """
         file_name = filedialog.asksaveasfilename(defaultextension=".csv")
         if file_name:
             with open(file_name, 'w', newline='') as file:
@@ -31,13 +47,17 @@ class CompressionInfoGUI(tk.Tk):
                 for row in self.tree.get_children():
                     writer.writerow(self.tree.item(row)['values'])
 
-
-
     def set_window_properties(self):
+        """
+        Set the properties of the window, such as the title and size.
+        """
         self.title("File Compression Info")
         self.geometry("1000x600")  # Adjust the values as needed
 
     def set_background_image(self):
+        """
+        Set the background image of the window.
+        """
         curr_dir = os.path.dirname(os.path.abspath(__file__))
         img_path = os.path.join(curr_dir, "Happy Borat.png")
         bg_image = PhotoImage(file=img_path)
@@ -45,7 +65,11 @@ class CompressionInfoGUI(tk.Tk):
         bg_label = tk.Label(self, image=bg_image)
         bg_label.place(x=0, y=100, relwidth=1, relheight=1)
         bg_label.image = bg_image
+
     def create_treeview(self):
+        """
+        Create a treeview to display the compression information.
+        """
         self.tree = ttk.Treeview(self, columns=("Directory / File Name",
                                                 "Runtime",
                                                 "Compression Difference"))
@@ -61,11 +85,18 @@ class CompressionInfoGUI(tk.Tk):
         self.tree.pack()
 
     def insert_data_into_treeview(self):
+        """
+        Insert the compression information into the treeview.
+        """
         for file_info in self.compression_info.files_compression_info:
             file_name, runtime, compressed_by = file_info
-            self.tree.insert("", "end", values=(file_name, runtime, compressed_by))
+            self.tree.insert("", "end",
+                             values=(file_name, runtime, compressed_by))
 
     def set_fonts(self):
+        """
+        Set the fonts of the treeview.
+        """
         style = ttk.Style()
         style.configure("Treeview.Heading", font=("Sans-Serif", 16))
         style.configure("Treeview", font=("Sans-Serif", 13), tag=("data_row",))

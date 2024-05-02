@@ -1,15 +1,30 @@
 import os
 import re
 from helper_functions import zinput
-from config import FILE_HEADER_LENGTH
 
 
 class PathValidator:
+    """
+    The PathValidator class is responsible for
+     validating a file or directory path.
+    """
+
     def __init__(self, path):
+        """
+        Initialize the PathValidator with the path to be validated.
+
+        :param path: The path to be validated.
+        """
         self.path = path
 
     def __is_valid_file(self, file_path):
-        # checks if can open the file
+        """
+        Check if a file can be opened.
+
+        :param file_path: The path of the file to be checked.
+        :return: True if the file can be opened, False otherwise.
+        """
+        # Try to open the file
         try:
             with open(file_path, 'r'):
                 pass
@@ -18,19 +33,30 @@ class PathValidator:
         return True
 
     def is_directory_empty(self):
-        # checks if the directory is empty
+        """
+        Check if a directory is empty.
+
+        :return: False if the directory is not empty, True otherwise.
+        """
+        # Check if the directory is empty
         if os.path.isdir(self.path) and not os.listdir(self.path):
             raise ValueError(f"The specified directory {self.path} is empty. "
                              f"Can't add it to the archive")
         return False
 
     def validate_directory_for_archive(self):
-        # checks if the directory is valid for archiving
+        """
+        Check if a directory is valid for archiving.
+
+        :return: True if the directory is valid for archiving, False otherwise.
+        """
+        # Check if the directory is empty
         if self.is_directory_empty():
             raise ValueError(
                 f"The specified directory {self.path} is empty."
                 f" Can't add it to the archive")
 
+        # Check if all files in the directory are valid
         for name in os.listdir(self.path):
             file_path = os.path.join(self.path, name)
             if os.path.isfile(file_path):
@@ -41,15 +67,21 @@ class PathValidator:
         return True
 
     def __is_valid_path(self):
+        """
+        Check if a path is valid.
+
+        :return: True if the path is valid, False otherwise.
+        """
         try:
+            # Check if the path exists
             if not os.path.exists(self.path):
                 raise FileNotFoundError(f"File not found: {self.path}")
 
-            # following checks are for directories
+            # If the path is a directory, validate it for archiving
             if os.path.isdir(self.path):
                 self.validate_directory_for_archive()
 
-            # following checks are for files
+            # If the path is a file, validate it
             elif os.path.isfile(self.path):
                 if not self.__is_valid_file(self.path):
                     raise ValueError(f"Invalid file: {self.path}")
@@ -59,20 +91,42 @@ class PathValidator:
         return True
 
     def validate_path(self):
+        """
+        Validate a path. If the path is not valid,
+         ask the user to enter a valid path.
+
+        :return: The valid path.
+        """
         while not (self.__is_valid_path()):
             self.path = zinput("Enter valid path: ").strip('""')
         return self.path
 
 
 class TargetDirectoryValidator:
+    """
+    The TargetDirectoryValidator class is responsible for validating a target directory.
+    """
+
     def __init__(self, target_directory):
+        """
+        Initialize the TargetDirectoryValidator with the target directory to be validated.
+
+        :param target_directory: The target directory to be validated.
+        """
         self.target_directory = target_directory
 
     def __is_valid_target_directory(self):
+        """
+        Check if a target directory is valid.
+
+        :return: True if the target directory is valid, False otherwise.
+        """
         try:
+            # Check if the target directory exists
             if not os.path.exists(self.target_directory):
                 raise FileNotFoundError(
                     f"Directory not found: {self.target_directory}")
+            # Check if the target directory is a directory
             if not os.path.isdir(self.target_directory):
                 raise NotADirectoryError(
                     f"Not a directory: {self.target_directory}")
@@ -82,6 +136,13 @@ class TargetDirectoryValidator:
         return True
 
     def validate_target_directory(self):
+        """
+        Validate a target directory. If the target directory is not valid,
+        ask the user to enter a valid target directory.
+
+        :return: The valid target directory.
+        """
+        # Keep asking for a valid target directory until one is provided
         while not self.__is_valid_target_directory():
             self.target_directory = zinput(
                 "Enter a valid target directory: ").strip('""')
@@ -108,7 +169,6 @@ class UnitLengthValidator:
         while not self.__is_valid_unit_length():
             self.unit_length = zinput("Enter a valid unit length: ")
         return int(self.unit_length)
-
 
 class ArchiveValidator:
     """
@@ -211,6 +271,11 @@ class ArchiveValidator:
 
     @staticmethod
     def parse_path_in_archive(archive_path):
+        """
+        Parse the path in the archive into a list of keys.
+        :param archive_path:
+        :return:
+        """
         # Remove leading and trailing slashes
         archive_path = archive_path.strip('/')
         # Split the path into a list of files/directories

@@ -11,6 +11,10 @@ from eval_string_to_dict import EvalStringToDict
 
 
 class WorkOnArchive:
+    """
+    This class is responsible for working on an existing archive.
+     It allows the user to extract files, add files, and show the content of the archive.
+    """
 
     def __init__(self):
         self.path_to_archive = ""
@@ -20,6 +24,11 @@ class WorkOnArchive:
         self.av = None
 
     def get_path(self):
+        """
+        This function gets the path to the archive
+         file from the user and validates it.
+        :return:
+        """
         while True:
             path = Pv(zinput(
                 "Please enter the path to the archive file: ").strip(
@@ -31,10 +40,18 @@ class WorkOnArchive:
             break
 
     def get_target_dir(self):
+        """
+        This function gets the target directory from the user and validates it.
+        :return:
+        """
         target_dir = zinput("Please enter the target directory: ").strip('""')
         self.target_dir = TdV(target_dir).validate_target_directory()
 
     def get_metadata(self):
+        """
+        This function reads the metadata from the archive file and validates it.
+        :return:
+        """
         try:
             with open(self.path_to_archive, 'rb') as f:
                 print(f"Reading metadata from {self.path_to_archive}")
@@ -65,7 +82,6 @@ class WorkOnArchive:
                         metadata = metadata.decode('utf-8')
                         eval_string_to_dict = EvalStringToDict(metadata)
                         self.metadata = eval_string_to_dict.process_to_metadata()
-                        print(self.metadata)
 
                         # the process didn't return a dictionary
                         if not self.metadata:
@@ -94,6 +110,13 @@ class WorkOnArchive:
         return True
 
     def get_content_directory(self, dictionary, path='', start=''):
+        """
+        This function prints the content of the archive for the "show" command.
+        :param dictionary:
+        :param path:
+        :param start:
+        :return:
+        """
         for key, value in dictionary.items():
             new_path = f'{path}/{key}' if path else key
             if isinstance(value, dict):
@@ -107,6 +130,13 @@ class WorkOnArchive:
                 print(new_path)
 
     def get_relevant_metadata(self, path):
+        """
+        This function gets the relevant metadata for the files to extract.
+        The user can input a path to a file or a directory, and we need to
+        extract only them, for that we need to set the metadata to the relevant
+        :param path:
+        :return:
+        """
         path = self.av.parse_path_in_archive(path)
         current_dict = self.metadata
         for key in path:
@@ -119,6 +149,10 @@ class WorkOnArchive:
         return True
 
     def get_response(self):
+        """
+        This function gets the user input and validates it.
+        :return:
+        """
         while True:
             response = zinput(WOA_PROMPTS["get input"])
             if ' ' in response:
@@ -145,6 +179,12 @@ class WorkOnArchive:
             return response
 
     def input_decision_tree(self, user_input):
+        """
+        This function is the decision tree for the user input.
+        :param user_input:
+        :return:
+        """
+
         if user_input[0] == 'show' and len(user_input) == 1:
             self.get_content_directory(self.metadata)
             return True
@@ -175,16 +215,21 @@ class WorkOnArchive:
             print("extracting...")
             decompressor.extract()
 
-        if user_input[0] == 'back':
-            return False
         if user_input[0] == 'add':
+            # moving to add_to_archive.py
             add_to_archive = AtA(self.path_to_archive, self.metadata)
             add_to_archive.add_file_to_archive()
 
     def work_on_archive_main(self):
+        """
+        This function is the main function for working on an archive. It
+        :return:
+        """
         print(WOA_PROMPTS["--whelp"])
         while True:
             self.get_path()
+            # get metadata from archive, it also validates the metadata,
+            # returns True if successful
             if not self.get_metadata():
                 time.sleep(1)
                 continue

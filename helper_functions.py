@@ -1,7 +1,9 @@
 import os
 import hashlib
 from config import FLAGS, MAIN_PROMPTS
-
+"""
+a file of helper functions that are used globaly
+"""
 
 def hash_data(data):
     sha1 = hashlib.sha1()
