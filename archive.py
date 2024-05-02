@@ -1,5 +1,4 @@
 from config import FLAGS
-import json
 from helper_functions import make_unique_path
 from time import sleep
 
@@ -27,7 +26,6 @@ class ArchiveCreator:
         # Convert metadata to JSON and encode to bytes
         print(self.metadata)
         print(type(self.metadata))
-        # self.metadata = json.dumps(self.metadata)
         self.metadata = str(self.metadata)
         print(self.metadata)
         print(type(self.metadata))

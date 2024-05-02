@@ -1,4 +1,3 @@
-import json
 import os
 import time
 
@@ -8,6 +7,7 @@ from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
                        ArchiveValidator as Av)
 from decompression import Decompressor
 from add_to_archive import AddToArchive as AtA
+from eval_string_to_dict import EvalStringToDict
 
 
 class WorkOnArchive:
@@ -43,35 +43,55 @@ class WorkOnArchive:
 
                 if footer != b'ZM\x05\x06':
                     raise ValueError(
-                        "Invalid archive, missing appropriate footer")
+                        f"Invalid archive: Missing footer in"
+                        f" {self.path_to_archive}")
 
                 is_header = bytearray()
 
                 while f.tell() > 0:  # While not at the start of the file
                     f.seek(-1, os.SEEK_CUR)  # Move the pointer back 1 byte
                     byte = f.read(1)  # Read the byte
-                    is_header.insert(0, byte[
-                        0])  # Add the byte to the start of the found sequence
+                    # Add the byte to the start of the found sequence
+                    is_header.insert(0, byte[0])
                     self.metadata_length += 1  # Increment the header_length
                     if len(is_header) > 4:  # If the found sequence is too long
                         is_header.pop()  # Remove the last byte
-                    if is_header == b'ZM\x01\x02':  # If the found sequence matches the target sequence
+                        # If the found sequence matches the target sequence
+                    if is_header == b'ZM\x01\x02':
                         f.seek(3, os.SEEK_CUR)
                         self.metadata_length -= 4
-                        metadata = f.read(
-                            self.metadata_length - 4)  # avoid reading the footer
+                        # avoid reading the footer
+                        metadata = f.read(self.metadata_length - 4)
                         metadata = metadata.decode('utf-8')
-                        self.metadata = eval(metadata)
-                        # self.metadata = json.loads(metadata)
+                        eval_string_to_dict = EvalStringToDict(metadata)
+                        self.metadata = eval_string_to_dict.process_to_metadata()
+                        print(self.metadata)
+
+                        # the process didn't return a dictionary
+                        if not self.metadata:
+                            raise ValueError(f"Metadata is not a valid "
+                                             f"dictionary: {metadata}")
+
                         break
                     f.seek(-1, os.SEEK_CUR)
 
-                if 'metadata' not in locals():
-                    raise ValueError("Invalid archive - metadata invalid")
-            return True
-        except Exception as e:
+                self.av = Av(self.path_to_archive, self.metadata)
+                if not self.av.validate_metadata():
+                    print("Invalid metadata: archive's metadata format is "
+                          "invalid")
+                    return False
+        except ValueError as e:
             print(f"Error reading metadata: {e}")
             return False
+
+        except IOError as e:
+            print(f"Error opening file {self.path_to_archive}: {e}")
+            return False
+        except UnicodeDecodeError as e:
+            print(f"Error decoding metadata in {self.path_to_archive}: {e}")
+            return False
+
+        return True
 
     def get_content_directory(self, dictionary, path='', start=''):
         for key, value in dictionary.items():
@@ -137,11 +157,9 @@ class WorkOnArchive:
         elif user_input[0] == 'extract':
             if len(user_input) == 2:  # extract specific files
                 # get relevant metadata only for the files to extract
-                print(self.metadata)
                 if not self.get_relevant_metadata(user_input[1]):
                     print("Invalid path in archive")
                     return True
-                print(self.metadata)
 
             self.get_target_dir()
             target_dir_name = os.path.basename(self.path_to_archive)
@@ -154,7 +172,7 @@ class WorkOnArchive:
             decompressor = Decompressor(self.path_to_archive,
                                         self.target_dir, self.metadata,
                                         self.metadata_length)
-            print("now extracting")
+            print("extracting...")
             decompressor.extract()
 
         if user_input[0] == 'back':
@@ -168,10 +186,6 @@ class WorkOnArchive:
         while True:
             self.get_path()
             if not self.get_metadata():
-                time.sleep(1)
-                continue
-            self.av = Av(self.path_to_archive, self.metadata)
-            if not self.av.validate_archive():
                 time.sleep(1)
                 continue
             break

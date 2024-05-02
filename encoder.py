@@ -63,7 +63,7 @@ class RunLengthEncoder:
         hashed_content = hash_data(self.content)
         encoded, encoded_content_size = self.content_encoder(hashed_content)
 
-        return encoded, encoded_content_size, str(hashed_content), self.bytes_num
+        return encoded, encoded_content_size, self.bytes_num
 
 
 

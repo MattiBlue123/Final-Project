@@ -1,7 +1,6 @@
 import os
 import hashlib
 from config import FLAGS, MAIN_PROMPTS
-import time
 
 
 def hash_data(data):
@@ -32,20 +31,6 @@ def zinput(prompt):
         else:
             return user_input
 
-
-# Initialize the list
-files_compression_info = []
-
-def timer_decorator(func):
-    def wrapper(self, metadata, pointer=0):
-        start_time = time.time()
-        result = func(self, metadata, pointer)
-        end_time = time.time()
-        runtime = end_time - start_time
-        # Append the file name and runtime to the list
-        files_compression_info.append((metadata.get("origin path", "unknown file"), runtime))
-        return result
-    return wrapper
 
 def make_unique_path(target_dir, archive_name):
     """

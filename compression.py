@@ -43,11 +43,10 @@ class Compressor:
 
         return metadata, all_encoded_content_list, general_pointer
 
-    def update_metadata(self, file_metadata, encoded_content_size,
-                        hashed_content, bytes_num):
+    @staticmethod
+    def update_metadata(file_metadata, encoded_content_size, bytes_num):
         file_metadata["original size"] = bytes_num
         file_metadata["encoded size"] = encoded_content_size
-        # file_metadata["data hash"] = hashed_content
         return file_metadata
 
     @archiving_timer_decorator

@@ -1,7 +1,6 @@
 import struct
 import os
 from helper_functions import hash_data, make_unique_path
-# import ast
 from config import FILE_HEADER_LENGTH
 
 class RunLengthDecoder:
@@ -15,7 +14,6 @@ class RunLengthDecoder:
         self.pointer = self.file_metadata["pointer"]
         self.encoded_size = self.file_metadata["encoded size"]
         self.unit_length = self.file_metadata["unit length"]
-        # self.data_hash = self.file_metadata["data hash"]
         self.original_size = self.file_metadata["original size"]
         self.decoded_content = b''
         self.decoded_size = 0
@@ -78,13 +76,6 @@ class RunLengthDecoder:
     def validate_decoding_process(self):
         # validate the decoding process
         after_decoding_hash = hash_data(self.decoded_content)
-        print(type(self.header_hash))
-        print(f"Original hash: {self.header_hash}")
-        print(type(after_decoding_hash))
-        print(f"Decoded hash: {after_decoding_hash}")
-
-
-        # original_data_hash = ast.literal_eval(self.data_hash)
         if self.header_hash != after_decoding_hash:
             raise ValueError(f" Data corrupted - hash mismatch")
         if self.original_size != self.decoded_size:

@@ -28,12 +28,14 @@ class CompressorInit:
             path = Pv(
                 zinput(CI_PROMPTS["get path"]).strip('""')).validate_path()
             return path
+
+        # if it's not the first path to be added
         else:
             path = zinput(CI_PROMPTS["another path"]).strip('""')
             if path == 'ok':
                 return 'ok'
             else:
-                Pv(path).validate_path()
+                path = Pv(path).validate_path()
                 return path
 
     @staticmethod
@@ -65,7 +67,6 @@ class CompressorInit:
         file_metadata["pointer"] = None
         file_metadata["encoded size"] = None
         file_metadata["unit length"] = unit_length
-        # file_metadata["data hash"] = None
         file_metadata["original size"] = os.path.getsize(path)
         return file_metadata
 
@@ -86,11 +87,14 @@ class CompressorInit:
         for file in os.listdir(path):
             file_path = os.path.join(path, file)
             if os.path.isdir(file_path):
-                directory_metadata[file] = self.create_directory_metadata(
-                    file_path, unit_length)
+                directory_metadata["|" + file + "|"] = \
+                    (self.create_directory_metadata(file_path, unit_length))
+
+                # directory_metadata[file] = \
             else:
-                directory_metadata[file] = self.create_file_metadata(
-                    file_path, unit_length)
+                # directory_metadata[file] = \
+                directory_metadata["|" + file + "|"] = \
+                    (self.create_file_metadata(file_path, unit_length))
         return directory_metadata
 
     def create_metadata(self, path, unit_length):
@@ -122,7 +126,8 @@ class CompressorInit:
             unit_length = self.get_unit_length()
         else:
             unit_length = self.unit_length
-        self.metadata[self.archive_name] = \
+
+        self.metadata["|"+self.archive_name+"|"] = \
             self.create_metadata(path, unit_length)
         if self.target_dir == '':
             self.get_target_dir()
@@ -137,8 +142,9 @@ class CompressorInit:
                 else:
                     unit_length = self.unit_length
                 path_name = os.path.basename(path)
-                self.metadata[path_name] = self.create_metadata(path,
-                                                                unit_length)
+                # self.metadata[path_name] =\
+                self.metadata["|" + path_name + "|"] =\
+                    self.create_metadata(path, unit_length)
         compressor = Compressor(self.metadata, self.target_dir,
                                 self.archive_name)
         compressed_output = compressor.compress(self.add_flag)
@@ -147,5 +153,3 @@ class CompressorInit:
             return compressed_output
         else:
             return
-
-
