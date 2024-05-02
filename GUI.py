@@ -1,4 +1,5 @@
 import csv
+import os
 import tkinter as tk
 from tkinter import ttk, PhotoImage, filedialog
 
@@ -37,7 +38,9 @@ class CompressionInfoGUI(tk.Tk):
         self.geometry("1000x600")  # Adjust the values as needed
 
     def set_background_image(self):
-        bg_image = PhotoImage(file=r"C:\Users\zohar\Downloads\My first design.png")
+        curr_dir = os.path.dirname(os.path.abspath(__file__))
+        img_path = os.path.join(curr_dir, "Happy Borat.png")
+        bg_image = PhotoImage(file=img_path)
         bg_image = bg_image.subsample(3, 3)
         bg_label = tk.Label(self, image=bg_image)
         bg_label.place(x=0, y=100, relwidth=1, relheight=1)

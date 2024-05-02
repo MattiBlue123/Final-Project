@@ -6,14 +6,11 @@ from GUI import CompressionInfoGUI
 class CompressionInfo:
     def __init__(self):
         self.files_compression_info = []
+        self.overall_size_diff = 0
 
     def add_info(self, file_name, runtime, compressed_by):
         self.files_compression_info.append((file_name, runtime, compressed_by))
 
-    def print_info(self):
-        for info in self.files_compression_info:
-            print(f"File: {info[0]}, Compression Time: {info[1]} seconds, "
-                  f"Compression Diff: {info[2]} bytes")
 
     def compression_stats_gui(self):
         gui = CompressionInfoGUI(self)
@@ -33,8 +30,10 @@ def file_compressing_timer_decorator(func):
         runtime = end_time - start_time
         compressed_by = metadata["original size"] - metadata["encoded size"]
         if compressed_by < 0:
+            compression_info.overall_size_diff -= compressed_by
             compressed_by = "expanded by " + str(abs(compressed_by))
         else:
+            compression_info.overall_size_diff += compressed_by
             compressed_by = "compressed by " + str(compressed_by)
         compression_info.add_info(file_name, runtime, compressed_by)
         return result
@@ -48,7 +47,15 @@ def archiving_timer_decorator(func):
         result = func(self, *args, **kwargs)
         end_time = time.time()
         runtime = end_time - start_time
-        compression_info.add_info("OVERALL COMPRESSION RUNTIME:", runtime, "")
+        if compression_info.overall_size_diff > 0:
+            compression_info.overall_size_diff =\
+                "expanded by " + str(abs(compression_info.overall_size_diff))
+        else:
+            compression_info.overall_size_diff =\
+                "compressed by " + str(compression_info.overall_size_diff)
+
+        compression_info.add_info("OVERALL COMPRESSION STATS:",
+                                  runtime, compression_info.overall_size_diff)
         compression_info.compression_stats_gui()
         return result
 
