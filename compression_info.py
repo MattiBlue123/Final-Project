@@ -110,7 +110,7 @@ def archiving_timer_decorator(func):
         # add the overall compression stats to the compression info
         compression_info.add_info("OVERALL COMPRESSION STATS:",
                                   runtime, compression_info.overall_size_diff)
-        # display the compression stats withhey GUI
+        # display the compression stats with GUI
         compression_info.compression_stats_gui()
         compression_info.reset()
         return result

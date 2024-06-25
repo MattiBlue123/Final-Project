@@ -92,11 +92,11 @@ class CompressorInit:
         for file in os.listdir(path):
             file_path = os.path.join(path, file)
             if os.path.isdir(file_path):
-                directory_metadata["|" + file + "|"] = \
+                directory_metadata[file] = \
                     (self.create_directory_metadata(file_path, unit_length))
 
             else:
-                directory_metadata["|" + file + "|"] = \
+                directory_metadata[file] = \
                     (self.create_file_metadata(file_path, unit_length))
         return directory_metadata
 
@@ -139,7 +139,7 @@ class CompressorInit:
             unit_length = self.unit_length
 
         # we add || to the name for later use in the archive opening process
-        self.metadata["|"+self.archive_name+"|"] = \
+        self.metadata[self.archive_name] = \
             self.create_metadata(path, unit_length)
 
         # get the target directory
@@ -158,7 +158,7 @@ class CompressorInit:
                     unit_length = self.unit_length
                 path_name = os.path.basename(path)
                 # self.metadata[path_name] =\
-                self.metadata["|" + path_name + "|"] =\
+                self.metadata[path_name] =\
                     self.create_metadata(path, unit_length)
         # compress the data
         compressor = Compressor(self.metadata, self.target_dir,

@@ -1,10 +1,12 @@
 import os
 from compression_init import CompressorInit as Ci
-from eval_string_to_dict import EvalStringToDict
+# from eval_string_to_dict import EvalStringToDict
+import ast
+
 
 class AddToArchive:
     """
-    The AddToArchive class is responsible for adding a file to an existing archive.
+    Responsible for adding a file to an existing archive.
     :param archive_path: The path to the archive file.
     :param archive_metadata: The metadata of the archive.
     Both parameters ar from the WorkOnArchive class.
@@ -56,21 +58,21 @@ class AddToArchive:
         for key, value in metadata_dict.items():
             if isinstance(value, dict):
                 if ("pointer" in value.keys() and
-                        isinstance(value["pointer"],int)):
+                        isinstance(value["pointer"], int)):
                     value["pointer"] += largest_pointer
                 self.update_file_pointers(value, largest_pointer)
 
-
     def process_file_metadata(self):
         """
-
+        Processes the metadata of the file to be added to the archive.
         :return:
         """
         # the metadata is in binary. Decode it to string.
         decoded_file_metadata = self.compressed_file_metadata.decode('utf-8')
         # convert the string to a metadata dictionary.
-        eval_string_to_dict = EvalStringToDict(decoded_file_metadata)
-        self.compressed_file_metadata = eval_string_to_dict.process_to_metadata()
+        # eval_string_to_dict = EvalStringToDict(decoded_file_metadata)
+        # self.compressed_file_metadata = eval_string_to_dict.process_to_metadata()
+        self.compressed_file_metadata = ast.literal_eval(decoded_file_metadata)
         self.update_file_pointers()
 
     def join_metadata(self):
@@ -119,9 +121,6 @@ class AddToArchive:
         except ValueError:
             raise ValueError("Metadata header missing in archive.")
 
-
-
-
     def add_file_to_archive(self):
         """
         This is the main method that adds the file to the archive,
@@ -140,4 +139,3 @@ class AddToArchive:
         self.process_file_metadata()
         self.add_file_content()
         print("File added to archive successfully.")
-

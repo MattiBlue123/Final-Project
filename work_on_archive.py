@@ -1,3 +1,4 @@
+import ast
 import os
 import time
 
@@ -80,8 +81,9 @@ class WorkOnArchive:
                         # avoid reading the footer
                         metadata = f.read(self.metadata_length - 4)
                         metadata = metadata.decode('utf-8')
-                        eval_string_to_dict = EvalStringToDict(metadata)
-                        self.metadata = eval_string_to_dict.process_to_metadata()
+                        # eval_string_to_dict = EvalStringToDict(metadata)
+                        # self.metadata = eval_string_to_dict.process_to_metadata()
+                        self.metadata = ast.literal_eval(metadata)
 
                         # the process didn't return a dictionary
                         if not self.metadata:

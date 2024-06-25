@@ -45,7 +45,7 @@ class Main:
 
     def main(self):
         while True:
-            # say hello to user, explain rules
+            # say hello to user, explain rulesc
             print(MAIN_PROMPTS["greeting"])
             print(MAIN_PROMPTS["--help"])
             # get user input
