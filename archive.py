@@ -1,4 +1,5 @@
-from config import FLAGS
+from compression_info import compression_info
+from config import FLAGS, METADATA_FOOTER, METADATA_HEADER
 from helper_functions import make_unique_path
 from time import sleep
 
@@ -8,13 +9,14 @@ class ArchiveCreator:
     the files in the target directory. The archive is created in the target."""
 
     def __init__(self, metadata, encoded_content, pointer, target_dir,
-                 archive_name, add_flag=False):
+                 archive_name, original_data_size, add_flag=False):
         self.metadata = metadata
         self.encoded_content = encoded_content
         self.pointer = pointer
         self.target_dir = target_dir
         self.archive_name = archive_name
         self.add_flag = add_flag
+        self.original_data_size = original_data_size
 
     def process_metadata(self):
         """
@@ -28,8 +30,8 @@ class ArchiveCreator:
 
         if not self.add_flag:
             # Add header and footer to the metadata
-            header = b'ZM\x01\x02'
-            footer = b'ZM\x05\x06'
+            header = METADATA_HEADER
+            footer = METADATA_FOOTER
             return header + self.metadata + footer
         # this is meant so that while adding to an existing archive,
         # the metadata will not have the header and footer.
@@ -50,10 +52,14 @@ class ArchiveCreator:
         # adding a number to the name if there is.
         archive_path = make_unique_path(self.target_dir, self.archive_name +
                                         "_compressed")
+        compression_info.archive_path = archive_path
+        compression_info.original_data_size = self.original_data_size
+
+
+
         # saving the archive to the target directory
         with open(archive_path, 'wb') as archive:
             archive.write(self.encoded_content)
         if not self.add_flag:
             print(f"Archive created and saved to: {archive_path}\n\n")
-            sleep(1)
             FLAGS["back flag"] = True

@@ -1,12 +1,16 @@
 import time
 from pathlib import Path
 from GUI import CompressionInfoGUI
+from config import FILE_HEADER_LENGTH, METADATA_FOOTER_LENGTH, \
+    METADATA_HEADER_LENGTH
 
 
 class CompressionInfo:
     def __init__(self):
         self.files_compression_info = []
         self.overall_size_diff = 0
+        self.archive_path = None
+        self.original_data_size = 0
 
     def add_info(self, file_name, runtime, compressed_by):
         """
@@ -61,7 +65,11 @@ def file_compressing_timer_decorator(func):
         result = func(self, metadata, pointer)
         end_time = time.time()
         runtime = end_time - start_time
+        print(f"metadata size:", metadata["encoded size"] + FILE_HEADER_LENGTH)
+        print(f"original size: ", metadata["original size"])
+
         compressed_by = metadata["original size"] - metadata["encoded size"]
+        compressed_by -= FILE_HEADER_LENGTH
         # if the file was expanded, compressed_by will be negative
         if compressed_by < 0:
             compression_info.overall_size_diff -= compressed_by
@@ -99,8 +107,15 @@ def archiving_timer_decorator(func):
         result = func(self, *args, **kwargs)
         end_time = time.time()
         runtime = end_time - start_time
+
         # if the overall size difference is negative, the archive was expanded
-        if compression_info.overall_size_diff > 0:
+
+        # compression_info.overall_size_diff += (METADATA_HEADER_LENGTH +
+        #                                        METADATA_FOOTER_LENGTH)
+
+        compression_info.overall_size_diff = calculate_overall_diff()
+
+        if compression_info.overall_size_diff < 0:
             compression_info.overall_size_diff = \
                 "expanded by " + str(abs(compression_info.overall_size_diff))
         # if the overall size difference is positive, the archive was compressed
@@ -116,3 +131,14 @@ def archiving_timer_decorator(func):
         return result
 
     return wrapper
+
+
+def calculate_overall_diff():
+    """
+
+    :return: The overall size difference.
+    """
+    original_size = compression_info.original_data_size
+    archive_size = Path(compression_info.archive_path).stat().st_size
+
+    return original_size - archive_size

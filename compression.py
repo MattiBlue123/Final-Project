@@ -19,13 +19,14 @@ class Compressor:
         self.metadata = metadata
         self.target_dir = target_dir
         self.archive_name = archive_name
+        self.original_data_size = 0
 
     @file_compressing_timer_decorator
     def file_compressor(self, metadata, pointer=0):
         """
         Compress a single file using Run Length Encoding.
         """
-        # innitialize the RunLengthEncoder with the file path and unit length
+        # initialize the RunLengthEncoder with the file path and unit length
         encoder = RunLengthEncoder(metadata.pop("origin path"),
                                    metadata["unit length"])
         # encode the content of the file, returns encoded content,
@@ -66,13 +67,13 @@ class Compressor:
 
         return metadata, all_encoded_content_list, general_pointer
 
-    @staticmethod
-    def update_metadata(file_metadata, encoded_content_size, bytes_num):
+    def update_metadata(self, file_metadata, encoded_content_size, bytes_num):
         """
         Update the metadata dictionary with the original and encoded sizes.
         """
         file_metadata["original size"] = bytes_num
         file_metadata["encoded size"] = encoded_content_size
+        self.original_data_size += bytes_num
         return file_metadata
 
     @archiving_timer_decorator
@@ -86,6 +87,7 @@ class Compressor:
         encoded_content = b''.join(encoded_content)
         # archiving all the content
         archive = ArchiveCreator(metadata, encoded_content, end_pointer,
-                                 self.target_dir, self.archive_name, add_flag)
+                                 self.target_dir, self.archive_name,
+                                 self.original_data_size, add_flag)
 
         return archive.create_archive()

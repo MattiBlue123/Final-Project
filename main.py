@@ -3,10 +3,12 @@ from work_on_archive import WorkOnArchive
 from compression_init import CompressorInit
 from config import *
 
+
 class Main:
     """
     This class is the main class of the program. It runs the main decision tree
     """
+
     def main_decision_tree(self, user_input):
         """
         :param user_input:
@@ -23,7 +25,6 @@ class Main:
         elif user_input == 'w':
             w = WorkOnArchive()
             w.work_on_archive_main()
-
 
     @staticmethod
     def get_user_input():
@@ -45,7 +46,7 @@ class Main:
 
     def main(self):
         while True:
-            # say hello to user, explain rulesc
+            # say hello to user, explain rules
             print(MAIN_PROMPTS["greeting"])
             print(MAIN_PROMPTS["--help"])
             # get user input
@@ -54,8 +55,5 @@ class Main:
             self.main_decision_tree(response)
 
 
-
 if __name__ == '__main__':
     Main().main()
-
-

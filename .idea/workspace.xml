@@ -5,12 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2e8fb633-2658-46e3-92e7-fe3548a44265" name="Changes" comment="&quot;GUI broken into methods&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/add_to_archive.py" beforeDir="false" afterPath="$PROJECT_DIR$/add_to_archive.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/READ ME.txt" beforeDir="false" afterPath="$PROJECT_DIR$/README" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VIDEO.txt" beforeDir="false" afterPath="$PROJECT_DIR$/VIDEO" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compression_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression_info.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compression_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression_init.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/funfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/funfile.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test_compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_compression.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/work_on_archive.py" beforeDir="false" afterPath="$PROJECT_DIR$/work_on_archive.py" afterDir="false" />

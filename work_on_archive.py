@@ -82,7 +82,8 @@ class WorkOnArchive:
                         metadata = f.read(self.metadata_length - 4)
                         metadata = metadata.decode('utf-8')
                         # eval_string_to_dict = EvalStringToDict(metadata)
-                        # self.metadata = eval_string_to_dict.process_to_metadata()
+                        # self.metadata =
+                        # eval_string_to_dict.ess_to_metadata()
                         self.metadata = ast.literal_eval(metadata)
 
                         # the process didn't return a dictionary
