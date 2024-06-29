@@ -78,8 +78,6 @@ def file_compressing_timer_decorator(func: callable) -> callable:
         result = func(self, metadata, pointer)
         end_time = time.time()
         runtime = end_time - start_time
-        print(f"metadata size:", metadata["encoded size"] + FILE_HEADER_LENGTH)
-        print(f"original size: ", metadata["original size"])
 
         compressed_by = metadata["original size"] - metadata["encoded size"]
         compressed_by -= FILE_HEADER_LENGTH
@@ -111,7 +109,8 @@ def archiving_timer_decorator(func: callable) -> callable:
         """
         Wrapper function that is called instead of the decorated function.
 
-        :param self: The instance of the class where the decorated function is defined.
+        :param self: The instance of the class where
+         the decorated function is defined.
         :param args: The positional arguments passed to the decorated function.
         :param kwargs: The keyword arguments passed to the decorated function.
         :return: The result of the decorated function.
@@ -131,7 +130,7 @@ def archiving_timer_decorator(func: callable) -> callable:
         if compression_info.overall_size_diff < 0:
             compression_info.overall_size_diff = \
                 "expanded by " + str(abs(compression_info.overall_size_diff))
-        # if the overall size difference is positive, the archive was compressed
+        # if the overall size difference is positive, it was compressed
         else:
             compression_info.overall_size_diff = \
                 "compressed by " + str(compression_info.overall_size_diff)

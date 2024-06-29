@@ -33,7 +33,7 @@ class RunLengthEncoder:
         :return:
         content (bin): The content of the file.
         """
-        with open(self.path, 'rb') as f:
+        with open(self.path, 'rb+') as f:
             content = f.read()
         return content
 

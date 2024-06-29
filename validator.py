@@ -154,7 +154,7 @@ class TargetDirectoryValidator:
 
 
 class UnitLengthValidator:
-    def __init__(self, unit_length: int):
+    def __init__(self, unit_length: str):
         self.unit_length = unit_length
 
     def __is_valid_unit_length(self) -> bool:

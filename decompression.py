@@ -1,6 +1,5 @@
 import os
 from typing import Dict
-
 from decoder import RunLengthDecoder
 
 
@@ -50,7 +49,7 @@ class Decompressor:
 
         :param:
         directory_metadata (dict): The metadata of the directory.
-        target_dir (str): The directory where the extracted files will be saved.
+        target_dir (str): The dir where the extracted files will be saved.
         :return:
         None
         """
