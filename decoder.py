@@ -104,9 +104,9 @@ class RunLengthDecoder:
         after_decoding_hash = hash_data(self.decoded_content)
         if self.header_hash != after_decoding_hash:
             raise ValueError(f" Data corrupted - hash mismatch")
-        if self.original_size != self.decoded_size:
+        if (self.original_size != self.decoded_size and self.decoded_content
+                != b' '):
             raise ValueError(f" Data corrupted - content has changed")
-
     def _is_text(self) -> bool:
         """
         Checks if the decoded content is text.
@@ -131,6 +131,8 @@ class RunLengthDecoder:
             content, extra_bytes = self.read_and_prepare_content()
             self.decode_content(content, extra_bytes)
             self.validate_decoding_process()
+            if self.decoded_content == b' ':
+                self.decoded_content = b''
         except Exception as e:
             print(f"Error decoding {self.file_name}:  {e}")
             return

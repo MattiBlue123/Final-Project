@@ -3,7 +3,7 @@ import struct
 import os
 from typing import Tuple
 from helper_functions import hash_data
-from config import MAX_COUNT
+from config import MAX_COUNT, FILE_HEADER_LENGTH
 
 
 class RunLengthEncoder:
@@ -35,9 +35,11 @@ class RunLengthEncoder:
         """
         with open(self.path, 'rb+') as f:
             content = f.read()
+        if not content:
+            return b' '
         return content
 
-    def content_encoder(self, header: bytes) -> Tuple[bin, int]:
+    def content_encoder(self, header: bytes) -> Tuple:
         """
         Encode the content of the file using Run Length Encoding.
 
@@ -51,10 +53,10 @@ class RunLengthEncoder:
         encoded_content_size = 0
         # if the unit length is greater than or equal
         # to the number of bytes in the content, don't need to encode it.
-        if self.unit_length >= self.bytes_num:
+        if self.unit_length > self.bytes_num:
             encoded.append(struct.pack('B', 1) + self.content)
             encoded = b''.join(encoded)
-            encoded_content_size = len(encoded)
+            encoded_content_size = len(encoded) - FILE_HEADER_LENGTH
             return encoded, encoded_content_size
 
         # encode the content
@@ -98,6 +100,8 @@ class RunLengthEncoder:
 
         :return: The encoded content, its size, and the original size.
         """
+        if not self.content:
+            return b'', 0, self.bytes_num
         hashed_content = hash_data(self.content)
         encoded, encoded_content_size = self.content_encoder(hashed_content)
 
