@@ -1,11 +1,13 @@
 import os
 import hashlib
-from config import FLAGS, MAIN_PROMPTS
+from config import FLAGS, MAIN_PROMPTS, CI_PROMPTS, WOA_PROMPTS
+
 """
 a file of helper functions that are used globaly
 """
 
-def hash_data(data):
+
+def hash_data(data: bin) -> bytes:
     sha1 = hashlib.sha1()
     if isinstance(data, str):
         sha1.update(data.encode('utf-8'))  # encode the string to bytes
@@ -14,27 +16,36 @@ def hash_data(data):
     return sha1.digest()
 
 
-def zinput(prompt):
+def zinput(prompt: str) -> str:
     """
     Get user input with support for graceful exit via "exit" command.
 
     """
-    while True:
-        user_input = input(prompt)
-        if user_input.lower() == 'exit':
-            print("Exiting program.")
-            FLAGS["exit_flag"] = True
-            exit(0)
-        elif user_input.lower() == "back":
-            FLAGS["back_flag"] = True
-            return ""
-        elif user_input.lower() == "--help":
-            print(MAIN_PROMPTS["--help"])
-        else:
-            return user_input
+    try:
+        while True:
+            user_input = input(prompt)
+            if user_input.lower() == 'exit':
+                print("\nExiting program.")
+                FLAGS["exit_flag"] = True
+                exit(0)
+            elif user_input.lower() == "back":
+                FLAGS["back_flag"] = True
+                return ""
+            elif user_input.lower() == "--help":
+                print(MAIN_PROMPTS["--help"])
+            elif user_input.lower() == "chelp":
+                print(CI_PROMPTS["chelp"])
+            elif user_input.lower() == "whelp":
+                print(WOA_PROMPTS["--whelp"])
+            else:
+                return user_input
+    except KeyboardInterrupt:
+        print("\nExiting program.")
+        FLAGS["exit_flag"] = True
+        exit(0)
 
 
-def make_unique_path(target_dir, archive_name):
+def make_unique_path(target_dir: str, archive_name: str) -> str:
     """
     Make the path unique by appending a number to the archive name.
 

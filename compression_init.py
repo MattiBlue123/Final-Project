@@ -1,3 +1,4 @@
+from typing import Dict, Union
 import os
 from compression import Compressor
 from config import CI_PROMPTS
@@ -13,7 +14,8 @@ class CompressorInit:
     compressed.
     """
 
-    def __init__(self, target_dir='', added_file_path=None, add_flag=False):
+    def __init__(self, target_dir: str = '', added_file_path: str = None,
+                 add_flag: bool = False):
         self.metadata = dict()
         self.target_dir = target_dir
         self.unit_length = 0
@@ -21,14 +23,18 @@ class CompressorInit:
         self.added_file_path = added_file_path
         self.add_flag = add_flag
 
-    def set_def_unit_length(self):
+    def set_def_unit_length(self) -> None:
+        """
+        Set the default unit length for the compression process.
+        """
         unit_length = zinput(CI_PROMPTS["set default unit length"]).strip()
         unit_length = UlV(unit_length).validate_unit_length()
         if unit_length:
             self.unit_length = unit_length
 
     @staticmethod
-    def get_path(first=False):
+    def get_path(first: bool = False) -> str:
+        """Get the path of the file or directory to be compressed."""
         if first:
             path = Pv(
                 zinput(CI_PROMPTS["get path"]).strip('""')).validate_path()
@@ -44,26 +50,26 @@ class CompressorInit:
                 return path
 
     @staticmethod
-    def get_unit_length():
+    def get_unit_length() -> int:
         unit_length = UlV(zinput(
             CI_PROMPTS["get ul"]).strip()).validate_unit_length()
         return unit_length
 
-    def get_target_dir(self):
+    def get_target_dir(self) -> None:
         target_dir = zinput("Please enter the target directory: ").strip('""')
         self.target_dir = TdV(target_dir).validate_target_directory()
 
     @staticmethod
-    def create_file_metadata(path, unit_length):
+    def create_file_metadata(path: str, unit_length: int) -> Dict:
         """
         Create metadata for a file.
 
-        Parameters:
+        :param:
         path (str): The path of the file.
         unit_length (int): The unit length.
         path_in_archive (str): The path in the archive.
 
-        Returns:
+        :return:
         dict: The metadata of the file.
         """
         file_metadata = dict()
@@ -75,16 +81,15 @@ class CompressorInit:
         file_metadata["original size"] = os.path.getsize(path)
         return file_metadata
 
-    def create_directory_metadata(self, path, unit_length):
+    def create_directory_metadata(self, path: str, unit_length: int) -> Dict:
         """
         Create metadata for a directory.
 
-        Parameters:
+        :param:
         path (str): The path of the directory.
         unit_length (int): The unit length.
-        path_in_archive (str): The path in the archive.
 
-        Returns:
+        :return:
         dict: The metadata of the directory.
         """
         directory_metadata = dict()
@@ -100,16 +105,16 @@ class CompressorInit:
                     (self.create_file_metadata(file_path, unit_length))
         return directory_metadata
 
-    def create_metadata(self, path, unit_length):
+    def create_metadata(self, path: str, unit_length: int) -> Dict:
         """
         Create metadata for a file or directory.
 
-        Parameters:
+        :param:
         path (str): The path of the file or directory.
         unit_length (int): The unit length.
         path_in_archive (str): The path in the archive.
 
-        Returns:
+        :return:
         dict: The metadata of the file or directory.
         """
         if os.path.isdir(path):
@@ -117,10 +122,11 @@ class CompressorInit:
         else:
             return self.create_file_metadata(path, unit_length)
 
-    def compressor_init_main(self):
+    def compressor_init_main(self) -> Union[None, bin]:
         """
         The main method for initializing the compression process.
         :return:
+        str: while "add" flag is True it returns the rle encoded content
         """
         # explains about the compressor
         print(CI_PROMPTS["chelp"])
@@ -158,7 +164,7 @@ class CompressorInit:
                     unit_length = self.unit_length
                 path_name = os.path.basename(path)
                 # self.metadata[path_name] =\
-                self.metadata[path_name] =\
+                self.metadata[path_name] = \
                     self.create_metadata(path, unit_length)
         # compress the data
         compressor = Compressor(self.metadata, self.target_dir,

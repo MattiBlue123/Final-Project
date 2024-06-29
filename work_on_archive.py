@@ -1,20 +1,20 @@
 import ast
 import os
 import time
-
-from config import WOA_PROMPTS, WOA_POSSIBLE_ACTIONS
+from typing import Dict
+from config import *
 from helper_functions import zinput, make_unique_path
 from validator import (PathValidator as Pv, TargetDirectoryValidator as TdV,
                        ArchiveValidator as Av)
 from decompression import Decompressor
 from add_to_archive import AddToArchive as AtA
-from eval_string_to_dict import EvalStringToDict
 
 
 class WorkOnArchive:
     """
     This class is responsible for working on an existing archive.
-     It allows the user to extract files, add files, and show the content of the archive.
+     It allows the user to extract files, add files,
+      and show the content of the archive.
     """
 
     def __init__(self):
@@ -24,7 +24,7 @@ class WorkOnArchive:
         self.target_dir = ''
         self.av = None
 
-    def get_path(self):
+    def get_path(self) -> None:
         """
         This function gets the path to the archive
          file from the user and validates it.
@@ -40,7 +40,7 @@ class WorkOnArchive:
             self.path_to_archive = path
             break
 
-    def get_target_dir(self):
+    def get_target_dir(self) -> None:
         """
         This function gets the target directory from the user and validates it.
         :return:
@@ -48,18 +48,18 @@ class WorkOnArchive:
         target_dir = zinput("Please enter the target directory: ").strip('""')
         self.target_dir = TdV(target_dir).validate_target_directory()
 
-    def get_metadata(self):
+    def get_metadata(self) -> bool:
         """
-        This function reads the metadata from the archive file and validates it.
+        Reads the metadata from the archive file and validates it.
         :return:
         """
         try:
             with open(self.path_to_archive, 'rb') as f:
                 print(f"Reading metadata from {self.path_to_archive}")
-                f.seek(-4, os.SEEK_END)
+                f.seek(-METADATA_FOOTER_LENGTH, os.SEEK_END)
                 footer = f.read()
 
-                if footer != b'ZM\x05\x06':
+                if footer != METADATA_FOOTER:
                     raise ValueError(
                         f"Invalid archive: Missing footer in"
                         f" {self.path_to_archive}")
@@ -72,18 +72,18 @@ class WorkOnArchive:
                     # Add the byte to the start of the found sequence
                     is_header.insert(0, byte[0])
                     self.metadata_length += 1  # Increment the header_length
-                    if len(is_header) > 4:  # If the found sequence is too long
+                    if len(is_header) > METADATA_HEADER_LENGTH:  # too long
                         is_header.pop()  # Remove the last byte
                         # If the found sequence matches the target sequence
-                    if is_header == b'ZM\x01\x02':
+                    if is_header == METADATA_HEADER:
                         f.seek(3, os.SEEK_CUR)
-                        self.metadata_length -= 4
+                        self.metadata_length -= METADATA_HEADER_LENGTH
                         # avoid reading the footer
-                        metadata = f.read(self.metadata_length - 4)
+                        metadata = f.read(
+                            self.metadata_length - METADATA_HEADER_LENGTH)
                         metadata = metadata.decode('utf-8')
-                        # eval_string_to_dict = EvalStringToDict(metadata)
-                        # self.metadata =
-                        # eval_string_to_dict.ess_to_metadata()
+                        # convert the string to a dictionary
+
                         self.metadata = ast.literal_eval(metadata)
 
                         # the process didn't return a dictionary
@@ -102,7 +102,10 @@ class WorkOnArchive:
         except ValueError as e:
             print(f"Error reading metadata: {e}")
             return False
-
+        except SyntaxError:
+            print(
+                f"Error parsing metadata in {self.path_to_archive}: Invalid syntax")
+            return False
         except IOError as e:
             print(f"Error opening file {self.path_to_archive}: {e}")
             return False
@@ -112,13 +115,16 @@ class WorkOnArchive:
 
         return True
 
-    def get_content_directory(self, dictionary, path='', start=''):
+    def get_content_directory(self, dictionary: Dict, path: str = '',
+                              start: str = '') -> None:
         """
         This function prints the content of the archive for the "show" command.
-        :param dictionary:
-        :param path:
-        :param start:
+        :param:
+        dictionary (dict): The dictionary to print.
+        path (str): The path in the archive.
+        start (str): The start of the path.
         :return:
+        None
         """
         for key, value in dictionary.items():
             new_path = f'{path}/{key}' if path else key
@@ -132,13 +138,15 @@ class WorkOnArchive:
                     value, dict):
                 print(new_path)
 
-    def get_relevant_metadata(self, path):
+    def get_relevant_metadata(self, path: str) -> bool:
         """
         This function gets the relevant metadata for the files to extract.
         The user can input a path to a file or a directory, and we need to
         extract only them, for that we need to set the metadata to the relevant
-        :param path:
+        :param:
+        path (str): The path in the archive.
         :return:
+        bool: True if the path is valid, False otherwise
         """
         path = self.av.parse_path_in_archive(path)
         current_dict = self.metadata
@@ -151,10 +159,11 @@ class WorkOnArchive:
         self.metadata = {path[-1]: current_dict}
         return True
 
-    def get_response(self):
+    def get_response(self) -> list:
         """
         This function gets the user input and validates it.
         :return:
+        list: The user input
         """
         while True:
             response = zinput(WOA_PROMPTS["get input"])
@@ -181,11 +190,14 @@ class WorkOnArchive:
                     continue
             return response
 
-    def input_decision_tree(self, user_input):
+    def input_decision_tree(self, user_input: list) -> bool:
         """
         This function is the decision tree for the user input.
-        :param user_input:
+        :param:
+        user_input (list): The user input.
         :return:
+        bool: True if the user wants to continue working on the archive,
+         False otherwise.
         """
 
         if user_input[0] == 'show' and len(user_input) == 1:
@@ -213,8 +225,7 @@ class WorkOnArchive:
                                                target_dir_name)
             os.mkdir(self.target_dir)
             decompressor = Decompressor(self.path_to_archive,
-                                        self.target_dir, self.metadata,
-                                        self.metadata_length)
+                                        self.target_dir, self.metadata)
             print("extracting...")
             decompressor.extract()
 
@@ -223,10 +234,9 @@ class WorkOnArchive:
             add_to_archive = AtA(self.path_to_archive, self.metadata)
             add_to_archive.add_file_to_archive()
 
-    def work_on_archive_main(self):
+    def work_on_archive_main(self) -> None:
         """
-        This function is the main function for working on an archive. It
-        :return:
+        This function is the main function for working on an archive.
         """
         print(WOA_PROMPTS["--whelp"])
         while True:

@@ -2,6 +2,8 @@ import unittest
 from unittest.mock import patch
 from work_on_archive import WorkOnArchive
 from compression_init import CompressorInit
+
+
 class TestCompressorInit(unittest.TestCase):
     @patch('compression_init.zinput', create=True)
     def test_compressor_init_main(self, mock_zinput):
@@ -16,6 +18,7 @@ class TestCompressorInit(unittest.TestCase):
 
         # Act
         compressed_output = compressor_init.compressor_init_main()
+
 
 #
 # class TestWorkOnArchive(unittest.TestCase):

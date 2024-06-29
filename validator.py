@@ -1,5 +1,7 @@
 import os
 import re
+from typing import Dict, Union, List
+
 from helper_functions import zinput
 
 
@@ -9,18 +11,18 @@ class PathValidator:
      validating a file or directory path.
     """
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         """
         Initialize the PathValidator with the path to be validated.
 
-        :param path: The path to be validated.
+        :param:
+        path (str): The path to be validated
         """
         self.path = path
 
-    def __is_valid_file(self, file_path):
+    @staticmethod
+    def __is_valid_file(file_path: str) -> bool:
         """
-        Check if a file can be opened.
-
         :param file_path: The path of the file to be checked.
         :return: True if the file can be opened, False otherwise.
         """
@@ -32,7 +34,7 @@ class PathValidator:
             raise IOError(f"File cannot be opened: {file_path}")
         return True
 
-    def is_directory_empty(self):
+    def __is_directory_empty(self) -> bool:
         """
         Check if a directory is empty.
 
@@ -44,14 +46,14 @@ class PathValidator:
                              f"Can't add it to the archive")
         return False
 
-    def validate_directory_for_archive(self):
+    def validate_directory_for_archive(self) -> bool:
         """
         Check if a directory is valid for archiving.
 
         :return: True if the directory is valid for archiving, False otherwise.
         """
         # Check if the directory is empty
-        if self.is_directory_empty():
+        if self.__is_directory_empty():
             raise ValueError(
                 f"The specified directory {self.path} is empty."
                 f" Can't add it to the archive")
@@ -66,7 +68,7 @@ class PathValidator:
 
         return True
 
-    def __is_valid_path(self):
+    def __is_valid_path(self) -> bool:
         """
         Check if a path is valid.
 
@@ -90,7 +92,7 @@ class PathValidator:
             return False
         return True
 
-    def validate_path(self):
+    def validate_path(self) -> str:
         """
         Validate a path. If the path is not valid,
          ask the user to enter a valid path.
@@ -104,18 +106,20 @@ class PathValidator:
 
 class TargetDirectoryValidator:
     """
-    The TargetDirectoryValidator class is responsible for validating a target directory.
+    The TargetDirectoryValidator class is responsible for validating
+    a target directory.
     """
 
-    def __init__(self, target_directory):
+    def __init__(self, target_directory: str):
         """
-        Initialize the TargetDirectoryValidator with the target directory to be validated.
+        Initialize the TargetDirectoryValidator with the target
+         directory to be validated.
 
         :param target_directory: The target directory to be validated.
         """
         self.target_directory = target_directory
 
-    def __is_valid_target_directory(self):
+    def __is_valid_target_directory(self) -> bool:
         """
         Check if a target directory is valid.
 
@@ -135,7 +139,7 @@ class TargetDirectoryValidator:
             return False
         return True
 
-    def validate_target_directory(self):
+    def validate_target_directory(self) -> str:
         """
         Validate a target directory. If the target directory is not valid,
         ask the user to enter a valid target directory.
@@ -150,10 +154,10 @@ class TargetDirectoryValidator:
 
 
 class UnitLengthValidator:
-    def __init__(self, unit_length):
+    def __init__(self, unit_length: int):
         self.unit_length = unit_length
 
-    def __is_valid_unit_length(self):
+    def __is_valid_unit_length(self) -> bool:
         try:
             self.unit_length = int(self.unit_length)
             if self.unit_length <= 0:
@@ -163,12 +167,13 @@ class UnitLengthValidator:
             return False
         return True
 
-    def validate_unit_length(self):
+    def validate_unit_length(self) -> Union[int, str]:
         if self.unit_length == "":
             return ""
         while not self.__is_valid_unit_length():
             self.unit_length = zinput("Enter a valid unit length: ")
         return int(self.unit_length)
+
 
 class ArchiveValidator:
     """
@@ -177,11 +182,11 @@ class ArchiveValidator:
     If it is, returns True. If not, tells what's wrong and returns False.
     """
 
-    def __init__(self, archive, metadata):
+    def __init__(self, archive: str, metadata: Dict):
         self.archive_path = archive
         self.metadata = metadata
 
-    def validate_metadata(self, curr_dict=None):
+    def validate_metadata(self, curr_dict: Dict = None) -> bool:
         """
         Validates that an archive's metadata has all essential keys
         and that the values' types are as expected.
@@ -240,14 +245,14 @@ class ArchiveValidator:
         return True
 
     @staticmethod
-    def validate_path_in_archive_format(path):
+    def validate_path_in_archive_format(path: str) -> bool:
         pattern = r"^/([\w\.\-\_ ]+/)*[\w\.\-\_ ]+$"
         if re.match(pattern, path):
             return True
         else:
             return False
 
-    def validate_path_in_archive(self, path_in_archive_input):
+    def validate_path_in_archive(self, path_in_archive_input: str) -> bool:
         if not self.validate_path_in_archive_format(path_in_archive_input):
             return False
         # Parse the archive path into a list of keys
@@ -270,7 +275,7 @@ class ArchiveValidator:
         return True
 
     @staticmethod
-    def parse_path_in_archive(archive_path):
+    def parse_path_in_archive(archive_path: str) -> List:
         """
         Parse the path in the archive into a list of keys.
         :param archive_path:

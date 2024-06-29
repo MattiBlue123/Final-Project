@@ -1,6 +1,7 @@
 from pathlib import Path
 import struct
 import os
+from typing import Tuple
 from helper_functions import hash_data
 from config import MAX_COUNT
 
@@ -11,13 +12,13 @@ class RunLengthEncoder:
     a file using Run Length Encoding.
     """
 
-    def __init__(self, path, unit_length):
+    def __init__(self, path: str, unit_length: int):
         """
         Initialize the RunLengthEncoder with the path of the file to
         be encoded and the unit length.
-
-        :param path: The path of the file to be encoded.
-        :param unit_length: The unit length for encoding.
+        :param:
+        path (str): The path of the file to be encoded.
+        unit_length (int): The unit length for encoding.
         """
         self.path = path
         self.file_name = Path(path).stem
@@ -25,22 +26,25 @@ class RunLengthEncoder:
         self.content = self.open_file()
         self.bytes_num = os.path.getsize(self.path)
 
-    def open_file(self):
+    def open_file(self) -> bin:
         """
         Open the file at the given path and read its content.
 
-        :return: The content of the file.
+        :return:
+        content (bin): The content of the file.
         """
         with open(self.path, 'rb') as f:
             content = f.read()
         return content
 
-    def content_encoder(self, header):
+    def content_encoder(self, header: bytes) -> Tuple[bin, int]:
         """
         Encode the content of the file using Run Length Encoding.
 
-        :param header: The header to be added to the encoded content.
-        :return: The encoded content and its size.
+        :param:
+         header: The header to be added to the encoded content.
+        :return:
+         The encoded content and its size.
         """
         encoded = [header]
         count = 1
@@ -87,7 +91,7 @@ class RunLengthEncoder:
 
         return b''.join(encoded), encoded_content_size
 
-    def rle_encode(self):
+    def rle_encode(self) -> Tuple[bin, int, int]:
         """
         Encode the content of the file using Run Length Encoding
         and return the encoded content, its size, and the original size.

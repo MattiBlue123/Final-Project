@@ -2,6 +2,7 @@ import csv
 import os
 import tkinter as tk
 from tkinter import ttk, PhotoImage, filedialog
+from typing import Any
 
 
 class CompressionInfoGUI(tk.Tk):
@@ -10,7 +11,7 @@ class CompressionInfoGUI(tk.Tk):
      that displays information about file compression.
     """
 
-    def __init__(self, compression_info):
+    def __init__(self, compression_info: Any):
         """
         Initialize the CompressionInfoGUI with the compression information.
 
@@ -26,7 +27,7 @@ class CompressionInfoGUI(tk.Tk):
         self.set_fonts()
         self.create_download_button()
 
-    def create_download_button(self):
+    def create_download_button(self) -> None:
         """
         Create a button that allows the user to download the data
         displayed in the treeview.
@@ -35,7 +36,7 @@ class CompressionInfoGUI(tk.Tk):
                                      command=self.download_treeview_data)
         download_button.pack()
 
-    def download_treeview_data(self):
+    def download_treeview_data(self) -> None:
         """
         Download the data displayed in the treeview as a CSV file.
         """
@@ -47,14 +48,14 @@ class CompressionInfoGUI(tk.Tk):
                 for row in self.tree.get_children():
                     writer.writerow(self.tree.item(row)['values'])
 
-    def set_window_properties(self):
+    def set_window_properties(self) -> None:
         """
         Set the properties of the window, such as the title and size.
         """
         self.title("File Compression Info")
         self.geometry("1000x600")  # Adjust the values as needed
 
-    def set_background_image(self):
+    def set_background_image(self) -> None:
         """
         Set the background image of the window.
         """
@@ -66,7 +67,7 @@ class CompressionInfoGUI(tk.Tk):
         bg_label.place(x=0, y=100, relwidth=1, relheight=1)
         bg_label.image = bg_image
 
-    def create_treeview(self):
+    def create_treeview(self) -> None:
         """
         Create a treeview to display the compression information.
         """
@@ -84,7 +85,7 @@ class CompressionInfoGUI(tk.Tk):
             self.tree.column(column, anchor="center")  # Center text in rows
         self.tree.pack()
 
-    def insert_data_into_treeview(self):
+    def insert_data_into_treeview(self) -> None:
         """
         Insert the compression information into the treeview.
         """
@@ -93,7 +94,8 @@ class CompressionInfoGUI(tk.Tk):
             self.tree.insert("", "end",
                              values=(file_name, runtime, compressed_by))
 
-    def set_fonts(self):
+    @staticmethod
+    def set_fonts() -> None:
         """
         Set the fonts of the treeview.
         """

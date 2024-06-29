@@ -9,12 +9,11 @@ class Main:
     This class is the main class of the program. It runs the main decision tree
     """
 
-    def main_decision_tree(self, user_input):
+    def main_decision_tree(self, user_input: str) -> None:
         """
         :param user_input:
         "c" - to compress
         "w" - to work on an existing archive (extract, add, show)
-        "info" - to get info about an archive
         "--help" - to see this message again
         "exit" - to exit the program completely
         :return:
@@ -27,7 +26,7 @@ class Main:
             w.work_on_archive_main()
 
     @staticmethod
-    def get_user_input():
+    def get_user_input() -> str:
         """
         This function gets the user input and validates it
         :return:
@@ -35,7 +34,7 @@ class Main:
         while True:
             response = zinput(MAIN_PROMPTS["get input"])
             if len(response) == 0 or len(response) > 1:
-                print("Invalid response1")
+                print("Invalid response")
                 continue
             if response not in MAIN_POSSIBLE_ACTIONS:
                 continue
@@ -44,7 +43,7 @@ class Main:
                 continue
             return response
 
-    def main(self):
+    def main(self) -> None:
         while True:
             # say hello to user, explain rules
             print(MAIN_PROMPTS["greeting"])

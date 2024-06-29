@@ -1,8 +1,9 @@
 import time
 from pathlib import Path
-from GUI import CompressionInfoGUI
-from config import FILE_HEADER_LENGTH, METADATA_FOOTER_LENGTH, \
-    METADATA_HEADER_LENGTH
+from typing import Dict, Any
+
+from gui import CompressionInfoGUI
+from config import FILE_HEADER_LENGTH
 
 
 class CompressionInfo:
@@ -12,27 +13,32 @@ class CompressionInfo:
         self.archive_path = None
         self.original_data_size = 0
 
-    def add_info(self, file_name, runtime, compressed_by):
+    def add_info(self, file_name: str, runtime: float, compressed_by: str) \
+            -> None:
         """
-        :param file_name: name of the file and its parent directory
-        :param runtime: runtime of the compression
-        :param compressed_by: how much the file was compressed by
+        :param:
+        file_name (str): The name of the file.
+        runtime (int): The time taken to compress the file.
+        compressed_by (float): The size diff before and after compression.
         :return:
+        None
         """
         self.files_compression_info.append((file_name, runtime, compressed_by))
 
-    def compression_stats_gui(self):
+    def compression_stats_gui(self) -> None:
         """
         The calling function for the CompressionInfoGUI
         :return:
+        None
         """
         gui = CompressionInfoGUI(self)
         gui.mainloop()
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Resets the compression info between runs
         :return:
+        None
         """
         self.files_compression_info = []
         self.overall_size_diff = 0
@@ -41,25 +47,32 @@ class CompressionInfo:
 compression_info = CompressionInfo()
 
 
-def file_compressing_timer_decorator(func):
+def file_compressing_timer_decorator(func: callable) -> callable:
     """
-    Decorator function to measure the time taken to compress a file and calculate the size difference before and after compression.
+    Decorator function to measure the time taken to compress a file
+     and calculate the size difference before and after compression.
 
-    :param func: The function to be decorated.
-    :return: The decorated function.
+    :param:
+    func (callable): The function to be decorated.
+    :return:
+    The decorated function.
     """
 
-    def wrapper(self, metadata, pointer=0):
+    def wrapper(self, metadata: Dict, pointer: int = 0) -> Any:
         """
         Wrapper function that is called instead of the decorated function.
 
-        :param self: The instance of the class where the decorated function is defined.
-        :param metadata: The metadata of the file to be compressed.
-        :param pointer: The pointer to the current position in the file.
-        :return: The result of the decorated function.
+        :param
+        self (Compressor): The instance of the class where the decorated
+        function is defined.
+        metadata (Dict): The metadata of the file to be compressed.
+        pointer (int): The pointer to the file in the archive.
+        :return:
+        The result of the decorated function.
         """
         file_path = Path(metadata["origin path"])
-        # not to be confused with two files with the same name in different directories
+        # not to be confused with two files with the same name
+        # in different directories
         file_name = f"{file_path.parent.name}/{file_path.stem}"
         start_time = time.time()
         result = func(self, metadata, pointer)
@@ -85,7 +98,7 @@ def file_compressing_timer_decorator(func):
     return wrapper
 
 
-def archiving_timer_decorator(func):
+def archiving_timer_decorator(func: callable) -> callable:
     """
     Decorator function to measure the time taken to create an
     archive and calculate the overall size difference.
@@ -133,7 +146,7 @@ def archiving_timer_decorator(func):
     return wrapper
 
 
-def calculate_overall_diff():
+def calculate_overall_diff() -> float:
     """
 
     :return: The overall size difference.
