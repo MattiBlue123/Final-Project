@@ -62,7 +62,7 @@ def file_compressing_timer_decorator(func: callable) -> callable:
         """
         Wrapper function that is called instead of the decorated function.
 
-        :param
+        :param:
         self (Compressor): The instance of the class where the decorated
         function is defined.
         metadata (Dict): The metadata of the file to be compressed.
@@ -119,13 +119,11 @@ def archiving_timer_decorator(func: callable) -> callable:
         result = func(self, *args, **kwargs)
         end_time = time.time()
         runtime = end_time - start_time
-        compression_info.archive_path = kwargs.get('archive_path', '')
-
+        add_flag = kwargs.get('add_flag', False)
+        if add_flag:
+            compression_info.archive_path = kwargs.get('archive_path', '')
 
         # if the overall size difference is negative, the archive was expanded
-
-        # compression_info.overall_size_diff += (METADATA_HEADER_LENGTH +
-        #                                        METADATA_FOOTER_LENGTH)
 
         compression_info.overall_size_diff = calculate_overall_diff()
 
@@ -152,8 +150,11 @@ def calculate_overall_diff() -> float:
 
     :return: The overall size difference.
     """
-    print(f"archive's path: {compression_info.archive_path}")
     original_size = compression_info.original_data_size
+    print("archive path", compression_info.archive_path)
+    print(type(compression_info.archive_path))
+    print(f"Original size: {original_size}")
+    print(f"arcihve size {Path(compression_info.archive_path).stat().st_size}")
     archive_size = Path(compression_info.archive_path).stat().st_size
 
     return original_size - archive_size

@@ -44,8 +44,6 @@ class Compressor:
         # encode the content of the file, returns encoded content,
         # encoded_content_size, original size
         rle_return_vals = encoder.rle_encode()
-        # if rle_return_vals[2] < metadata["unit length"]:
-        #     metadata["unit length"] = rle_return_vals[2]
         encoded_content = rle_return_vals[0]
         metadata["pointer"] = rle_return_vals[1] + FILE_HEADER_LENGTH + pointer
         # update the metadata with the original and encoded sizes

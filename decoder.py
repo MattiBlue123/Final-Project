@@ -107,6 +107,7 @@ class RunLengthDecoder:
         if (self.original_size != self.decoded_size and self.decoded_content
                 != b' '):
             raise ValueError(f" Data corrupted - content has changed")
+
     def _is_text(self) -> bool:
         """
         Checks if the decoded content is text.

@@ -5,7 +5,8 @@ from compression_init import CompressorInit as Ci
 # from eval_string_to_dict import EvalStringToDict
 import ast
 
-from config import METADATA_FOOTER, METADATA_HEADER
+from config import METADATA_FOOTER, METADATA_HEADER, METADATA_HEADER_LENGTH, \
+    METADATA_FOOTER_LENGTH
 
 
 class AddToArchive:
@@ -108,7 +109,7 @@ class AddToArchive:
         try:
             with open(self.archive_path, 'rb+') as f:
                 print(f"Reading metadata from {self.archive_path}")
-                f.seek(-4, os.SEEK_END)
+                f.seek(-METADATA_FOOTER_LENGTH, os.SEEK_END)
                 footer = f.read()
 
                 if footer != METADATA_FOOTER:
@@ -123,7 +124,8 @@ class AddToArchive:
                     is_header.insert(0, byte[
                         0])  # Add the byte to the start of the found sequence
                     metadata_length += 1  # Increment the header_length
-                    if len(is_header) > 4:  # If the found sequence is too long
+                    # if the found sequence is too long
+                    if len(is_header) > METADATA_HEADER_LENGTH:
                         is_header.pop()  # Remove the last byte
                         # If the found sequence matches the target sequence
                     if is_header == METADATA_HEADER:

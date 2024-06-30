@@ -104,7 +104,8 @@ class WorkOnArchive:
             return False
         except SyntaxError:
             print(
-                f"Error parsing metadata in {self.path_to_archive}: Invalid syntax")
+                f"Error parsing metadata {self.path_to_archive}:"
+                f" Invalid syntax")
             return False
         except IOError as e:
             print(f"Error opening file {self.path_to_archive}: {e}")
