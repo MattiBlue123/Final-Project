@@ -5,12 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2e8fb633-2658-46e3-92e7-fe3548a44265" name="Changes" comment="&quot;GUI broken into methods&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README" beforeDir="false" afterPath="$PROJECT_DIR$/README" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/add_to_archive.py" beforeDir="false" afterPath="$PROJECT_DIR$/add_to_archive.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/decoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/encoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_compression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compression_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression_info.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compression_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/compression_init.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval_string_to_dict.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/final_project.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/funfile.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,39 +46,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Python tests.Python tests in test_compression.py.executor": "Run",
-    "Python.GUI.executor": "Run",
-    "Python.UI.executor": "Run",
-    "Python.archive.executor": "Run",
-    "Python.compression.executor": "Run",
-    "Python.compression_helper.executor": "Run",
-    "Python.compression_info.executor": "Run",
-    "Python.config.executor": "Run",
-    "Python.decoder.executor": "Debug",
-    "Python.decompression.executor": "Debug",
-    "Python.decompression_init.executor": "Run",
-    "Python.decompressor_init.executor": "Debug",
-    "Python.encoder.executor": "Run",
-    "Python.encoder_update.executor": "Run",
-    "Python.eval_string_to_dict.executor": "Run",
-    "Python.everything_validator.executor": "Debug",
-    "Python.funfile.executor": "Run",
-    "Python.helper_functions.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.main_updated.executor": "Run",
-    "Python.validator.executor": "Debug",
-    "Python.work_on_archive.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Program Files",
-    "settings.editor.selected.configurable": "preferences.sourceCode"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Python tests.Python tests in test_compression.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GUI.executor&quot;: &quot;Run&quot;,
+    &quot;Python.UI.executor&quot;: &quot;Run&quot;,
+    &quot;Python.archive.executor&quot;: &quot;Run&quot;,
+    &quot;Python.compression.executor&quot;: &quot;Run&quot;,
+    &quot;Python.compression_helper.executor&quot;: &quot;Run&quot;,
+    &quot;Python.compression_info.executor&quot;: &quot;Run&quot;,
+    &quot;Python.config.executor&quot;: &quot;Run&quot;,
+    &quot;Python.decoder.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.decompression.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.decompression_init.executor&quot;: &quot;Run&quot;,
+    &quot;Python.decompressor_init.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.encoder.executor&quot;: &quot;Run&quot;,
+    &quot;Python.encoder_update.executor&quot;: &quot;Run&quot;,
+    &quot;Python.eval_string_to_dict.executor&quot;: &quot;Run&quot;,
+    &quot;Python.everything_validator.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.funfile.executor&quot;: &quot;Run&quot;,
+    &quot;Python.helper_functions.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_updated.executor&quot;: &quot;Run&quot;,
+    &quot;Python.validator.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.work_on_archive.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Program Files&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Python.main">
     <configuration name="funfile" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Final_Project" />

@@ -119,6 +119,8 @@ def archiving_timer_decorator(func: callable) -> callable:
         result = func(self, *args, **kwargs)
         end_time = time.time()
         runtime = end_time - start_time
+        compression_info.archive_path = kwargs.get('archive_path', '')
+
 
         # if the overall size difference is negative, the archive was expanded
 
@@ -150,6 +152,7 @@ def calculate_overall_diff() -> float:
 
     :return: The overall size difference.
     """
+    print(f"archive's path: {compression_info.archive_path}")
     original_size = compression_info.original_data_size
     archive_size = Path(compression_info.archive_path).stat().st_size
 

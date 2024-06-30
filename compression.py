@@ -100,11 +100,13 @@ class Compressor:
         return file_metadata
 
     @archiving_timer_decorator
-    def compress(self, add_flag: bool = False) -> Union[None, Tuple]:
+    def compress(self, add_flag: bool = False, archive_path: str = '')\
+            -> Union[None, Tuple]:
         """
         Compress all files and create an archive.
         :param:
         add_flag (bool): A flag to indicate if the archive is being added to.
+        archive_path (str): The path of the archive to add to (if adding)
         :return:
         Union[None, Tuple]: The added file's metadata and encoded content -
         if added. Else - None.

@@ -15,13 +15,14 @@ class CompressorInit:
     """
 
     def __init__(self, target_dir: str = '', added_file_path: str = None,
-                 add_flag: bool = False):
+                 add_flag: bool = False, archive_path: str = ''):
         self.metadata = dict()
         self.target_dir = target_dir
         self.unit_length = 0
         self.archive_name = ''
         self.added_file_path = added_file_path
         self.add_flag = add_flag
+        self.archive_path = archive_path
 
     def set_def_unit_length(self) -> None:
         """
@@ -169,7 +170,8 @@ class CompressorInit:
         # compress the data
         compressor = Compressor(self.metadata, self.target_dir,
                                 self.archive_name)
-        compressed_output = compressor.compress(self.add_flag)
+        compressed_output = compressor.compress(self.add_flag,
+                                                self.archive_path)
 
         if compressed_output:
             return compressed_output
